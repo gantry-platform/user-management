@@ -28,7 +28,7 @@ public class GlobalDefaultExceptionHandler extends ResponseEntityExceptionHandle
     }
 
     @ExceptionHandler(APIException.class)
-    public ResponseEntity<Error> handlerConflict(Exception ex,HttpServletResponse response) throws Exception{
+    public ResponseEntity<Error> apiExceptionHandler(Exception ex,HttpServletResponse response) throws Exception{
         ex.printStackTrace();
         Error err = new Error();
         HttpStatus status = ((APIException) ex).getHttpStatus();
