@@ -42,7 +42,7 @@ public class UserAPITest {
     @Before
     public void setup(){
         userInvitation = new UserInvitation();
-        userInvitation.setEamil("temp@inslab.co.kr");
+        userInvitation.setEamil("echan1020@gmail.com");
     }
 
     @Test
