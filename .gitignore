@@ -1,0 +1,9 @@
+.idea/
+.settings/
+.swagger-codegen/
+target/
+bin/
+.classpath
+.project
+.swagger-codegen-ignore
+*.iml
