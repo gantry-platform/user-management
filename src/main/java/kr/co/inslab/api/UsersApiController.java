@@ -33,13 +33,13 @@ public class UsersApiController implements UsersApi {
 
     private final HttpServletRequest request;
 
-    @Autowired
-    UserService userService;
+    private final UserService userService;
 
     @org.springframework.beans.factory.annotation.Autowired
-    public UsersApiController(ObjectMapper objectMapper, HttpServletRequest request) {
+    public UsersApiController(ObjectMapper objectMapper, HttpServletRequest request, UserService userService) {
         this.objectMapper = objectMapper;
         this.request = request;
+        this.userService = userService;
     }
 
 
@@ -47,7 +47,7 @@ public class UsersApiController implements UsersApi {
 
         String email = body.getEamil();
 
-        List<UserRepresentation> userRepresentations = userService.getUserByEmail(email);
+        List<UserRepresentation> userRepresentations = this.userService.getUserByEmail(email);
 
         if(userRepresentations.size()!=0){
             throw new APIException(email,HttpStatus.CONFLICT);
@@ -66,9 +66,9 @@ public class UsersApiController implements UsersApi {
         userRepresentation.setRequiredActions(actions);
 
 
-        userService.inviteUser(userRepresentation);
+        this.userService.inviteUser(userRepresentation);
 
-        List<UserRepresentation> invitedUser = userService.getUserByEmail(email);
+        List<UserRepresentation> invitedUser = this.userService.getUserByEmail(email);
         if (invitedUser.size() == 0){
             throw new APIException(email,HttpStatus.NOT_FOUND);
         }else if(invitedUser.size() > 1){
@@ -76,7 +76,7 @@ public class UsersApiController implements UsersApi {
         }
 
         //send email
-        UserResource resource= userService.getUserResourceById(invitedUser.get(0).getId());
+        UserResource resource= this.userService.getUserResourceById(invitedUser.get(0).getId());
         resource.sendVerifyEmail();
 
         return new ResponseEntity<String>("Created",HttpStatus.CREATED);
@@ -84,15 +84,16 @@ public class UsersApiController implements UsersApi {
 
     public ResponseEntity<String> usersIdDelete(@ApiParam(value = "",required=true) @PathVariable("id") String id) throws Exception{
 
-        UserResource userResource = userService.getUserResourceById(id);
+        UserResource userResource = this.userService.getUserResourceById(id);
 
         try {
+            //TODO: javax.ws.rs 상위 예외 처리로 변경 필요
             UserRepresentation userRepresentation = userResource.toRepresentation();
         }catch (javax.ws.rs.NotFoundException e){
             throw new APIException(id,HttpStatus.NOT_FOUND);
         }
 
-        userService.getUserResourceById(id).remove();
+        this.userService.getUserResourceById(id).remove();
 
         return new ResponseEntity<String>("Success",HttpStatus.OK);
     }

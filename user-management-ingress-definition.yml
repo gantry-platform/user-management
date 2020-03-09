@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  name: user
+  namespace: gantry-user-management
+spec:
+  rules:
+    - host: gantryuser.mgmt.dev.gantry.ai
+      http:
+        paths:
+          - backend:
+              serviceName: user
+              servicePort: 80
+            path: /
+  tls:
+    - hosts:
+        - gantryuser.mgmt.dev.gantry.ai
+      secretName: user-ingress-tls
