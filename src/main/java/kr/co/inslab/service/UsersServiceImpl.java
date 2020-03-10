@@ -16,26 +16,28 @@ public class UsersServiceImpl implements UserService {
 
     private final Logger logger = LoggerFactory.getLogger(UsersServiceImpl.class);
 
-    @Autowired
-    KeyCloakAdmin keyCloakAdmin;
 
+    private final KeyCloakAdmin keyCloakAdmin;
 
+    public UsersServiceImpl(KeyCloakAdmin keyCloakAdmin){
+        this.keyCloakAdmin = keyCloakAdmin;
+    }
 
     @Override
     public List<UserRepresentation> getUserByEmail(String email) throws Exception {
-        List<UserRepresentation> userRepresentations= keyCloakAdmin.getInstance().realm(keyCloakAdmin.getTargetRealm())
+        List<UserRepresentation> userRepresentations= this.keyCloakAdmin.getInstance().realm(this.keyCloakAdmin.getTargetRealm())
                 .users().search(null,null,null,email,0,10);
         return userRepresentations;
     }
 
     @Override
     public UserResource getUserResourceById(String id) throws Exception {
-        UserResource userResource = keyCloakAdmin.getInstance().realm(keyCloakAdmin.getTargetRealm()).users().get(id);
+        UserResource userResource = this.keyCloakAdmin.getInstance().realm(this.keyCloakAdmin.getTargetRealm()).users().get(id);
         return userResource;
     }
 
     @Override
     public void inviteUser(UserRepresentation userRepresentation) throws Exception {
-        keyCloakAdmin.getInstance().realm(keyCloakAdmin.getTargetRealm()).users().create(userRepresentation);
+        this.keyCloakAdmin.getInstance().realm(this.keyCloakAdmin.getTargetRealm()).users().create(userRepresentation);
     }
 }
