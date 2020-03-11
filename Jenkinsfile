@@ -69,7 +69,7 @@ podTemplate(
         stage('create image') {
             container('docker') {
                 dir("source_dir") {
-                    sh 'docker build -t gantry/user-management:0.1 --build-arg JAR_FILE=target/*.jar --build-arg SPRING_PROFILES_ACTIVE=dev .'
+                    sh 'docker build -t gantry/user-management:0.1 --build-arg JAR_FILE=target/*.jar .'
                     sh 'docker images'
                 }
             }
