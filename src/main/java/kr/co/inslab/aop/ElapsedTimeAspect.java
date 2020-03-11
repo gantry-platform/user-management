@@ -24,7 +24,7 @@ public class ElapsedTimeAspect {
         Object obj = joinPoint.proceed();
 
         long elapsedTime = System.currentTimeMillis() - start;
-        logger.info("Elapsed Time: "+elapsedTime+" millis"+", Class:"+typeName+", Method:"+name);
+        logger.debug("Elapsed Time: "+elapsedTime+" millis"+", Class:"+typeName+", Method:"+name);
 
 
         return obj;

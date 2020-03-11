@@ -6,7 +6,7 @@ metadata:
   labels:
     app: user
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: user
@@ -15,10 +15,14 @@ spec:
       labels:
         app: user
     spec:
+      serviceAccountName: user-management-account
       containers:
       - name: user
-        image: harbor.dev.gantry.ai/gantry/user-management-service:0.1
+        image: harbor.dev.gantry.ai/gantry/user-management:0.1
         ports:
-        - containerPort: 9090
+        - containerPort: 8080
+        env:
+        - name: JAVA_OPTIONS
+          value: -Dspring-boot.run.profiles=dev
       imagePullSecrets:
       - name: harbor-secret
