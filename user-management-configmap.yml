@@ -28,7 +28,7 @@ data:
       kubernetes:
         name: my-a1111pp333
         version: 3.1.1.0.Final
-        group: us333123er
+        group: test-group
     logging:
       #  file: /tmp/test.log
       pattern:
