@@ -23,6 +23,6 @@ spec:
         - containerPort: 8080
         env:
         - name: JAVA_OPTIONS
-          value: -Dspring.profiles.active=dev
+          value: -Dspring-boot.run.profiles=dev
       imagePullSecrets:
       - name: harbor-secret
