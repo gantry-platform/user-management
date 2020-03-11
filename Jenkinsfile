@@ -69,7 +69,7 @@ podTemplate(
         stage('create image') {
             container('docker') {
                 dir("source_dir") {
-                    sh 'docker build -t gantry/user-management-service:0.1 --build-arg JAR_FILE=target/*.jar .'
+                    sh 'docker build -t gantry/user-management:0.1 --build-arg JAR_FILE=target/*.jar --build-arg SPRING_PROFILES_ACTIVE=dev .'
                     sh 'docker images'
                 }
             }
@@ -78,8 +78,8 @@ podTemplate(
             container('docker') {
                 dir("source_dir"){
                    docker.withRegistry("https://${harbor}", "Harbor_Chanho") {
-                       sh "docker tag gantry/user-management-service:0.1 ${harbor}/${harbor_project}/user-management-service:0.1"
-                       sh "docker push ${harbor}/${harbor_project}/user-management-service:0.1"
+                       sh "docker tag gantry/user-management:0.1 ${harbor}/${harbor_project}/user-management:0.1"
+                       sh "docker push ${harbor}/${harbor_project}/user-management:0.1"
                    }
                 }
             }

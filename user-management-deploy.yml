@@ -17,8 +17,8 @@ spec:
     spec:
       containers:
       - name: user
-        image: harbor.dev.gantry.ai/gantry/user-management-service:0.1
+        image: harbor.dev.gantry.ai/gantry/user-management:0.1
         ports:
-        - containerPort: 9090
+        - containerPort: 8080
       imagePullSecrets:
       - name: harbor-secret
