@@ -4,18 +4,14 @@ import org.springframework.http.HttpStatus;
 
 public class APIException extends Exception{
 
-    private HttpStatus httpStatus;
+    private final HttpStatus httpStatus;
 
-    public APIException(String resource, HttpStatus httpStatus) {
-        super("Exception Resource : "+resource);
+    public APIException(String message,HttpStatus httpStatus) {
+        super(message);
         this.httpStatus = httpStatus;
     }
 
     public HttpStatus getHttpStatus() {
         return httpStatus;
-    }
-
-    public void setHttpStatus(HttpStatus httpStatus) {
-        this.httpStatus = httpStatus;
     }
 }

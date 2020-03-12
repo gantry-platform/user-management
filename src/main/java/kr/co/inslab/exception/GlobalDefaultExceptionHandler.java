@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.WebApplicationException;
 
 @ControllerAdvice
 public class GlobalDefaultExceptionHandler extends ResponseEntityExceptionHandler {
@@ -32,6 +33,17 @@ public class GlobalDefaultExceptionHandler extends ResponseEntityExceptionHandle
         ex.printStackTrace();
         Error err = new Error();
         HttpStatus status = ((APIException) ex).getHttpStatus();
+        err.setCode(status.toString());
+        err.setMessage(ex.getMessage());
+        return new ResponseEntity<>(err,status);
+    }
+
+    @ExceptionHandler(javax.ws.rs.WebApplicationException.class)
+    public ResponseEntity<Error> webApplicationException(Exception ex,HttpServletResponse response) throws Exception{
+        ex.printStackTrace();
+        Error err = new Error();
+        int statusCode = ((WebApplicationException) ex).getResponse().getStatus();
+        HttpStatus status = HttpStatus.resolve(statusCode);
         err.setCode(status.toString());
         err.setMessage(ex.getMessage());
         return new ResponseEntity<>(err,status);

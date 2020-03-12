@@ -48,33 +48,21 @@ public class UsersApiController implements UsersApi {
         List<UserRepresentation> userRepresentations = this.userService.getUserByEmail(email);
 
         if(userRepresentations.size()!=0){
-            throw new APIException(email,HttpStatus.CONFLICT);
+            throw new APIException(HttpStatus.CONFLICT.toString(),HttpStatus.CONFLICT);
         }
 
-        UserRepresentation userRepresentation = new UserRepresentation();
-        userRepresentation.setEnabled(true);
-        userRepresentation.setEmailVerified(true);
-        userRepresentation.setEmail(email);
-        userRepresentation.setUsername(email);
-
-        List<String> actions = new ArrayList<String>();
-        actions.add(KeyCloakStaticConfig.UPDATE_PROFILE);
-        actions.add(KeyCloakStaticConfig.UPDATE_PASSWORD);
-        actions.add(KeyCloakStaticConfig.VERIFY_EMAIL);
-        userRepresentation.setRequiredActions(actions);
-
-
-        this.userService.inviteUser(userRepresentation);
+        //inviteUser
+        this.userService.inviteUser(email);
 
         List<UserRepresentation> invitedUser = this.userService.getUserByEmail(email);
         if (invitedUser.size() == 0){
-            throw new APIException(email,HttpStatus.NOT_FOUND);
+            throw new APIException(HttpStatus.NOT_FOUND.toString(),HttpStatus.NOT_FOUND);
         }else if(invitedUser.size() > 1){
-            throw new APIException(email,HttpStatus.CONFLICT);
+            throw new APIException(HttpStatus.CONFLICT.toString(),HttpStatus.CONFLICT);
         }
 
-        //send email
-        UserResource resource= this.userService.getUserResourceById(invitedUser.get(0).getId());
+        //sendVerifyEmail
+        UserResource resource = this.userService.getUserResourceById(invitedUser.get(0).getId());
         resource.sendVerifyEmail();
 
         return new ResponseEntity<String>("Created",HttpStatus.CREATED);
@@ -84,12 +72,7 @@ public class UsersApiController implements UsersApi {
 
         UserResource userResource = this.userService.getUserResourceById(id);
 
-        try {
-            //TODO: javax.ws.rs 상위 예외 처리로 변경 필요
-            UserRepresentation userRepresentation = userResource.toRepresentation();
-        }catch (javax.ws.rs.NotFoundException e){
-            throw new APIException(id,HttpStatus.NOT_FOUND);
-        }
+        UserRepresentation userRepresentation = userResource.toRepresentation();
 
         this.userService.getUserResourceById(id).remove();
 
