@@ -3,7 +3,6 @@ package kr.co.inslab.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiParam;
 import kr.co.inslab.exception.APIException;
-import kr.co.inslab.keycloak.KeyCloakStaticConfig;
 import kr.co.inslab.model.UserInvitation;
 import kr.co.inslab.service.UserService;
 import org.keycloak.admin.client.resource.UserResource;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-02-26T15:17:27.527+09:00[Asia/Seoul]")
