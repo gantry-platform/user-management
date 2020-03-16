@@ -650,9 +650,9 @@ components:
     Member:
       type: object
       properties:
-        id:
+        user_id:
           type: string
-        name:
+        user_name:
           type: string
         email:
           type: string

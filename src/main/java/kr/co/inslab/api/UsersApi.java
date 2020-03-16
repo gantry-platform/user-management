@@ -5,44 +5,70 @@
  */
 package kr.co.inslab.api;
 
-import io.swagger.annotations.*;
 import kr.co.inslab.model.Error;
-import kr.co.inslab.model.UserInvitation;
+import kr.co.inslab.model.NewProject;
+import kr.co.inslab.model.Project;
+import kr.co.inslab.model.User;
+import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.CookieValue;
 
 import javax.validation.Valid;
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-02-26T15:17:27.527+09:00[Asia/Seoul]")
+import javax.validation.constraints.*;
+import java.util.List;
+import java.util.Map;
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-03-16T09:54:20.497+09:00[Asia/Seoul]")
 @Api(value = "users", description = "the users API")
 public interface UsersApi {
 
-    @ApiOperation(value = "invite a new user", nickname = "usersInvitationPost", notes = "", tags={ "users", })
+    @ApiOperation(value = "유저 정보 조회", nickname = "usersUserIdGet", notes = "", response = User.class, tags={ "users", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 201, message = "Created"),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 409, message = "Conflict", response = Error.class) })
-    @RequestMapping(value = "/users/invitation",
-        produces = { "application/json" }, 
-        consumes = { "application/json" },
-        method = RequestMethod.POST)
-    ResponseEntity<String> usersInvitationPost(@ApiParam(value = "" ,required=true )  @Valid @RequestBody UserInvitation body
-) throws Exception;
-
-
-    @ApiOperation(value = "delete a user", nickname = "usersIdDelete", notes = "", tags={ "users", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Success"),
+        @ApiResponse(code = 200, message = "Success", response = User.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class) })
-    @RequestMapping(value = "/users/{id}",
+    @RequestMapping(value = "/users/{user_id}",
         produces = { "application/json" }, 
-        method = RequestMethod.DELETE)
-    ResponseEntity<String> usersIdDelete(@ApiParam(value = "",required=true) @PathVariable("id") String id
+        method = RequestMethod.GET)
+    ResponseEntity<User> usersUserIdGet(@ApiParam(value = "user_id(not name)",required=true) @PathVariable("user_id") String userId
 ) throws Exception;
+
+
+    @ApiOperation(value = "유저의 전체 프로젝트 정보 조회", nickname = "usersUserIdProjectsGet", notes = "", response = Project.class, responseContainer = "List", tags={ "users", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Success", response = Project.class, responseContainer = "List"),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class) })
+    @RequestMapping(value = "/users/{user_id}/projects",
+        produces = { "application/json" }, 
+        method = RequestMethod.GET)
+    ResponseEntity<List<Project>> usersUserIdProjectsGet(@ApiParam(value = "user_id(not name)",required=true) @PathVariable("user_id") String userId
+) throws Exception;
+
+
+    @ApiOperation(value = "신규 프로젝트 생성", nickname = "usersUserIdProjectsPost", notes = "", response = Project.class, tags={ "users", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 201, message = "Create", response = Project.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 409, message = "Conflict", response = Error.class) })
+    @RequestMapping(value = "/users/{user_id}/projects",
+        produces = { "application/json" }, 
+        consumes = { "application/json" },
+        method = RequestMethod.POST)
+    ResponseEntity<Project> usersUserIdProjectsPost(@ApiParam(value = "" ,required=true )  @Valid @RequestBody NewProject body
+,@ApiParam(value = "user_id(not name)",required=true) @PathVariable("user_id") String userId
+)throws  Exception;
 
 }
