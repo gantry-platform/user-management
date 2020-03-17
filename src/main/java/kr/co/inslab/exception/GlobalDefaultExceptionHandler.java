@@ -38,6 +38,16 @@ public class GlobalDefaultExceptionHandler extends ResponseEntityExceptionHandle
         return new ResponseEntity<>(err,status);
     }
 
+    @ExceptionHandler(KeyCloakAdminException.class)
+    public ResponseEntity<Error> keyCloakExceptionHandler(Exception ex,HttpServletResponse response) throws Exception{
+        ex.printStackTrace();
+        Error err = new Error();
+        HttpStatus status = ((KeyCloakAdminException) ex).getHttpStatus();
+        err.setCode(status.toString());
+        err.setMessage(ex.getMessage());
+        return new ResponseEntity<>(err,status);
+    }
+
     @ExceptionHandler(javax.ws.rs.WebApplicationException.class)
     public ResponseEntity<Error> webApplicationException(Exception ex,HttpServletResponse response) throws Exception{
         ex.printStackTrace();

@@ -43,16 +43,21 @@ public class UsersApiController implements UsersApi {
         return res;
     }
 
-    @Override
-    public ResponseEntity<List<Project>> usersUserIdProjectsGet(String userId) throws Exception {
-        return null;
-    }
 
     @Override
     public ResponseEntity<Project> usersUserIdProjectsPost(@Valid NewProject body, String userId) throws Exception {
-        return null;
-    }
 
+        userService.checkUser(userId);
+
+        String displayName = body.getDisplayName();
+        String description = body.getDescription();
+
+        Project project = userService.createProject(userId,displayName,description);
+
+        ResponseEntity<Project> res = new ResponseEntity<Project>(project,HttpStatus.OK);
+
+        return res;
+    }
 
 
 }

@@ -21,8 +21,8 @@ public class User   {
   @JsonProperty("user_id")
   private String userId = null;
 
-  @JsonProperty("eamil")
-  private String eamil = null;
+  @JsonProperty("email")
+  private String email = null;
 
   @JsonProperty("user_name")
   private String userName = null;
@@ -59,23 +59,23 @@ public class User   {
     this.userId = userId;
   }
 
-  public User eamil(String eamil) {
-    this.eamil = eamil;
+  public User email(String email) {
+    this.email = email;
     return this;
   }
 
   /**
-   * Get eamil
-   * @return eamil
+   * Get email
+   * @return email
   **/
   @ApiModelProperty(value = "")
   
-    public String getEamil() {
-    return eamil;
+    public String getEmail() {
+    return email;
   }
 
-  public void setEamil(String eamil) {
-    this.eamil = eamil;
+  public void setEmail(String email) {
+    this.email = email;
   }
 
   public User userName(String userName) {
@@ -192,7 +192,7 @@ public class User   {
     }
     User user = (User) o;
     return Objects.equals(this.userId, user.userId) &&
-        Objects.equals(this.eamil, user.eamil) &&
+        Objects.equals(this.email, user.email) &&
         Objects.equals(this.userName, user.userName) &&
         Objects.equals(this.firstName, user.firstName) &&
         Objects.equals(this.lastName, user.lastName) &&
@@ -202,7 +202,7 @@ public class User   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(userId, eamil, userName, firstName, lastName, emailVerified, projects);
+    return Objects.hash(userId, email, userName, firstName, lastName, emailVerified, projects);
   }
 
   @Override
@@ -211,7 +211,7 @@ public class User   {
     sb.append("class User {\n");
     
     sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
-    sb.append("    eamil: ").append(toIndentedString(eamil)).append("\n");
+    sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("    userName: ").append(toIndentedString(userName)).append("\n");
     sb.append("    firstName: ").append(toIndentedString(firstName)).append("\n");
     sb.append("    lastName: ").append(toIndentedString(lastName)).append("\n");

@@ -55,45 +55,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /users/{user_id}/projects:
-    get:
-      summary: 유저의 전체 프로젝트 정보 조회
-      tags:
-        - users
-      parameters:
-        - name: user_id
-          in: path
-          required: true
-          description: user_id(not name)
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Project'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
     post:
       summary: 신규 프로젝트 생성
       tags:
@@ -602,7 +563,7 @@ components:
       properties:
         user_id:
           type: string
-        eamil:
+        email:
           type: string
         user_name:
           type: string
@@ -656,6 +617,8 @@ components:
           type: string
         email:
           type: string
+        email_verified:
+          type: boolean
     NewProject:
       type: object
       required:

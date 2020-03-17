@@ -43,19 +43,6 @@ public interface UsersApi {
 ) throws Exception;
 
 
-    @ApiOperation(value = "유저의 전체 프로젝트 정보 조회", nickname = "usersUserIdProjectsGet", notes = "", response = Project.class, responseContainer = "List", tags={ "users", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Success", response = Project.class, responseContainer = "List"),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class) })
-    @RequestMapping(value = "/users/{user_id}/projects",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<List<Project>> usersUserIdProjectsGet(@ApiParam(value = "user_id(not name)",required=true) @PathVariable("user_id") String userId
-) throws Exception;
-
-
     @ApiOperation(value = "신규 프로젝트 생성", nickname = "usersUserIdProjectsPost", notes = "", response = Project.class, tags={ "users", })
     @ApiResponses(value = { 
         @ApiResponse(code = 201, message = "Create", response = Project.class),
