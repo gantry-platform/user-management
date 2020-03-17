@@ -42,29 +42,25 @@ public class ProjectsApiController implements ProjectsApi {
     }
 
     public ResponseEntity<Void> userIdProjectsProjectNameActivePut(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
-,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
-) {
+,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName) {
         String accept = request.getHeader("Accept");
         return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
     }
 
     public ResponseEntity<Void> userIdProjectsProjectNameArchivePut(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
-,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
-) {
+,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName) {
         String accept = request.getHeader("Accept");
         return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
     }
 
     public ResponseEntity<Void> userIdProjectsProjectNameDelete(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
-,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
-) {
+,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName) {
         String accept = request.getHeader("Accept");
         return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
     }
 
     public ResponseEntity<Project> userIdProjectsProjectNameGet(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
-,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
-) {
+,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {

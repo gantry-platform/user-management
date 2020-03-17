@@ -19,14 +19,13 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class UserServiceImpl extends AbstractKeyCloakAdminAPI implements UserService {
+public class UserServiceImpl extends AbstractKeyCloak implements UserService {
 
     private final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     public UserServiceImpl(KeyCloakAdmin keyCloakAdmin) {
         super(keyCloakAdmin);
     }
-
 
 
     @Override
@@ -55,35 +54,8 @@ public class UserServiceImpl extends AbstractKeyCloakAdminAPI implements UserSer
         super.joinGroup(projectGroupRep,userId);
         super.joinGroup(adminGroupRep,userId);
 
+        Project project = super.makeProjectInfo(projectGroupRep.getId());
 
-        Project project = new Project();
-        project.setDisplayName(displayName);
-        project.setName(projectName);
-        project.setOwner(userId);
-
-        if(!description.isEmpty()){
-            project.setDescription(description);
-        }
-        List<Group> subGroups = new ArrayList<Group>();
-        Group adminGroup = new Group();
-        Group opsGroup = new Group();
-        Group devGroup = new Group();
-
-        List<Member> members = new ArrayList<Member>();
-        Member member = new Member();
-        member.setUserId(userId);
-        members.add(member);
-
-        adminGroup.setName(adminGroupName);
-        adminGroup.setMembers(members);
-        opsGroup.setName(opsGroupName);
-        devGroup.setName(devGroupName);
-
-        subGroups.add(adminGroup);
-        subGroups.add(opsGroup);
-        subGroups.add(devGroup);
-
-        project.setGroups(subGroups);
         return project;
     }
 
@@ -109,57 +81,12 @@ public class UserServiceImpl extends AbstractKeyCloakAdminAPI implements UserSer
         if (gantryProjects != null && gantryProjects.size() > 0){
             List<Project> projects = new ArrayList<Project>();
             for(GroupRepresentation gantryProject: gantryProjects){
-                GroupRepresentation groupRepresentation = super.getGroupByGroupId(gantryProject.getId());
-                List<GroupRepresentation> subGroups = groupRepresentation.getSubGroups();
-                if(subGroups != null && subGroups.size() > 0){
-                    Project project = new Project();
-                    project.setName(groupRepresentation.getName());
-                    Map<String, List<String>> groupAttrs = groupRepresentation.getAttributes();
-                    if (groupAttrs != null){
-                        for(String key : groupAttrs.keySet()){
-                            switch (key){
-                                case KeyCloakStaticConfig.DESCRIPTION:
-                                    project.setDescription(groupAttrs.get(key).get(0));
-                                    break;
-                                case KeyCloakStaticConfig.DISPLAY_NAME:
-                                    project.setDisplayName(groupAttrs.get(key).get(0));
-                                    break;
-                                case KeyCloakStaticConfig.OWNER:
-                                    project.setOwner(groupAttrs.get(key).get(0));
-                                    break;
-                                default:
-                                    logger.debug("attrs not found");
-                            }
-                        }
-                    }
-
-                    List<Group> groups = new ArrayList<Group>();
-                    for (GroupRepresentation gantryGroup : subGroups) {
-                        Group group = new Group();
-                        group.setName(gantryGroup.getName());
-                        List<UserRepresentation> gantryMembers = super.getMembersByGroupId(gantryGroup.getId());
-                        if (gantryMembers.size() > 0) {
-                            List<Member> members= new ArrayList<Member>();
-                            for (UserRepresentation gantryMember : gantryMembers) {
-                                Member member = new Member();
-                                member.setUserId(gantryMember.getId());
-                                member.setUserName(gantryMember.getUsername());
-                                member.setEmail(gantryMember.getEmail());
-                                members.add(member);
-                            }
-                            group.setMembers(members);
-                        }
-                        groups.add(group);
-                    }
-                    project.setGroups(groups);
-                    projects.add(project);
-                }
+                Project project = super.makeProjectInfo(gantryProject.getId());
+                projects.add(project);
             }
             user.setProjects(projects);
         }
         return user;
     }
-
-
 
 }
