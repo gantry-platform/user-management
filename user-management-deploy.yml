@@ -18,11 +18,9 @@ spec:
       serviceAccountName: user-management-account
       containers:
         - name: user
-          image: harbor.dev.gantry.ai/gantry/user-management:0.1
+          image: harbor.dev.gantry.ai/gantry/user-management:0.16
           ports:
-            - containerPort: 8080
-          env:
-            - name: JAVA_OPTIONS
-              value: -Dspring-boot.run.profiles=dev
+          - containerPort: 8080
+          args: ["--spring.profiles.active=dev"]
       imagePullSecrets:
         - name: harbor-secret

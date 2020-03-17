@@ -2,8 +2,6 @@ package kr.co.inslab.service;
 
 
 import kr.co.inslab.keycloak.*;
-import kr.co.inslab.model.Group;
-import kr.co.inslab.model.Member;
 import kr.co.inslab.model.Project;
 import kr.co.inslab.model.User;
 import org.keycloak.admin.client.resource.UserResource;
@@ -82,7 +80,9 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
             List<Project> projects = new ArrayList<Project>();
             for(GroupRepresentation gantryProject: gantryProjects){
                 Project project = super.makeProjectInfo(gantryProject.getId());
-                projects.add(project);
+                if(project != null){
+                    projects.add(project);
+                }
             }
             user.setProjects(projects);
         }

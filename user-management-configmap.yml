@@ -8,6 +8,7 @@ data:
     spring:
       jackson:
         date-format: yyyy-MM-dd HH:mm:ss
+        default-property-inclusion: non_null
         serialization:
           WRITE_DATES_AS_TIMESTAMPS: false
     springfox:
@@ -21,12 +22,12 @@ data:
     keycloak:
       serverUrl: https://keycloak.mgmt.dev.gantry.ai/auth
       masterRealm: master
-      targetRealm: gantry
+      targetRealm: sso-dev
       clientSecret: 26366793-8254-4a12-ae64-a643e3f45aec
       clientId: admin-application
     dekorate:
       kubernetes:
-        name: my-a1111pp333
+        name: my-1333-123123
         version: 3.1.1.0.Final
         group: test-group
     logging:
