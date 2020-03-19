@@ -1,6 +1,7 @@
 package kr.co.inslab.api;
 
 import kr.co.inslab.exception.APIException;
+import kr.co.inslab.keycloak.KeyCloakStaticConfig;
 import kr.co.inslab.model.Group;
 import kr.co.inslab.model.Member;
 import kr.co.inslab.model.Project;
@@ -22,7 +23,9 @@ import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-03-16T10:39:54.886+09:00[Asia/Seoul]")
 @Controller
@@ -44,23 +47,39 @@ public class ProjectsApiController implements ProjectsApi {
     }
 
     public ResponseEntity<Void> userIdProjectsProjectNameActivePut(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
-,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName) {
-        String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName) throws Exception{
+
+        this.checkResource(userId,projectName);
+
+        Map<String,String> attrs = new HashMap<String, String>();
+        attrs.put(KeyCloakStaticConfig.STATUS,Project.StatusEnum.ACTIVE.toString());
+
+        projectService.updateProjectInfo(projectName,attrs);
+
+        ResponseEntity<Void> res = new ResponseEntity<Void>(HttpStatus.OK);
+
+        return res;
+
     }
 
     public ResponseEntity<Void> userIdProjectsProjectNameArchivePut(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
-,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName) {
-        String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName) throws Exception{
+        this.checkResource(userId,projectName);
+
+        Map<String,String> attrs = new HashMap<String, String>();
+        attrs.put(KeyCloakStaticConfig.STATUS,Project.StatusEnum.ARCHIVE.toString());
+
+        projectService.updateProjectInfo(projectName,attrs);
+
+        ResponseEntity<Void> res = new ResponseEntity<Void>(HttpStatus.OK);
+
+        return res;
     }
 
     public ResponseEntity<Void> userIdProjectsProjectNameDelete(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
 ,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName) throws Exception{
 
-        projectService.checkUserById(userId);
-
-        projectService.getProjectByProjectName(projectName);
+        this.checkResource(userId,projectName);
 
         if(!projectService.isOwnerOfProject(userId,projectName)){
             throw new APIException(userId+"is not the owner of project",HttpStatus.BAD_REQUEST);
@@ -74,10 +93,8 @@ public class ProjectsApiController implements ProjectsApi {
 
     public ResponseEntity<Project> userIdProjectsProjectNameGet(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
 ,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName) throws Exception{
-        
-        projectService.checkUserById(userId);
 
-        projectService.getProjectByProjectName(projectName);
+        this.checkResource(userId,projectName);
 
         Boolean existsUserInProject = projectService.existsUserInProject(userId,projectName);
 
@@ -155,7 +172,7 @@ public class ProjectsApiController implements ProjectsApi {
 ,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
 ) throws Exception{
 
-        projectService.checkUserById(userId);
+        Map<String,String> attrs = null;
         String owner = body.getOwner();
         String description = body.getDescription();
 
@@ -163,11 +180,26 @@ public class ProjectsApiController implements ProjectsApi {
             throw new APIException(userId+"is not the owner of project",HttpStatus.BAD_REQUEST);
         }
 
-        projectService.updateProjectInfo(projectName,owner,description);
+        if(!owner.isEmpty() || !description.isEmpty()){
+            attrs = new HashMap<String, String>();
+            if(!owner.isEmpty()){
+                attrs.put(KeyCloakStaticConfig.OWNER,owner);
+            }
+            if(!description.isEmpty()){
+                attrs.put(KeyCloakStaticConfig.DESCRIPTION,description);
+            }
+        }
+
+        projectService.updateProjectInfo(projectName,attrs);
 
         ResponseEntity<Void> res = new ResponseEntity<Void>(HttpStatus.OK);
 
         return res;
+    }
+
+    private void checkResource(String userId,String projectName) throws APIException {
+        projectService.checkUserById(userId);
+        projectService.getProjectByProjectName(projectName);
     }
 
 }

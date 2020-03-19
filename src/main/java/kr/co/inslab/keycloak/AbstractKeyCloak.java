@@ -82,7 +82,7 @@ public abstract class AbstractKeyCloak {
     }
 
     protected void addRoleToGroup(GroupRepresentation targetGroup,Role role) {
-        RoleResource roleResource = this.getRealm().roles().get(role.name().toLowerCase());
+        RoleResource roleResource = this.getRealm().roles().get(role.toString());
         RoleRepresentation roleRepresentation = roleResource.toRepresentation();
         List<RoleRepresentation> roleRepresentations = new ArrayList<RoleRepresentation>();
         roleRepresentations.add(roleRepresentation);
@@ -187,6 +187,9 @@ public abstract class AbstractKeyCloak {
                         break;
                     case KeyCloakStaticConfig.OWNER:
                         project.setOwner(groupAttrs.get(key).get(0));
+                        break;
+                    case KeyCloakStaticConfig.STATUS:
+                        project.setStatus(Project.StatusEnum.fromValue(groupAttrs.get(key).get(0)));
                         break;
                     default:
                         logger.warn("New Attr Key:"+key);

@@ -42,7 +42,7 @@ public interface ProjectsApi {
         method = RequestMethod.PUT)
     ResponseEntity<Void> userIdProjectsProjectNameActivePut(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
 ,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
-);
+) throws Exception;
 
 
     @ApiOperation(value = "프로젝트 보관", nickname = "userIdProjectsProjectNameArchivePut", notes = "", tags={ "projects", })
@@ -56,7 +56,7 @@ public interface ProjectsApi {
         method = RequestMethod.PUT)
     ResponseEntity<Void> userIdProjectsProjectNameArchivePut(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
 ,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
-);
+) throws Exception;
 
 
     @ApiOperation(value = "프로젝트 삭제", nickname = "userIdProjectsProjectNameDelete", notes = "", tags={ "projects", })

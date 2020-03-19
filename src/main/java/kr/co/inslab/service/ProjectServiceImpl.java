@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.ws.rs.WebApplicationException;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectService {
@@ -70,14 +71,14 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
     }
 
     @Override
-    public void updateProjectInfo(String projectName,String owner, String description) {
+    public void updateProjectInfo(String projectName, Map<String,String> attrs) {
         String groupPath = this.projectNameToGroupPath(projectName);
         GroupRepresentation groupRepresentation = this.getGroupByGroupPath(groupPath);
-        if(!owner.isEmpty()){
-            groupRepresentation.singleAttribute(KeyCloakStaticConfig.OWNER,owner);
-        }
-        if(!description.isEmpty()){
-            groupRepresentation.singleAttribute(KeyCloakStaticConfig.DESCRIPTION,description);
+
+        if(attrs != null){
+            for(String key:attrs.keySet()){
+                groupRepresentation.singleAttribute(key,attrs.get(key));
+            }
         }
 
         this.updateGroup(groupRepresentation.getId(),groupRepresentation);
