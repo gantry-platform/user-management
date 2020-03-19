@@ -112,6 +112,10 @@ public abstract class AbstractKeyCloak {
         return this.keyCloakAdmin.getInstance().realm(this.keyCloakAdmin.getTargetRealm());
     }
 
+    protected void removeGroupById(String groupId){
+        this.getRealm().groups().group(groupId).remove();
+    }
+
 
     protected String getCreatedId(Response response) throws KeyCloakAdminException {
         URI location = response.getLocation();

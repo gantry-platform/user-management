@@ -11,8 +11,10 @@ import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.WebApplicationException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,8 +62,17 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
     }
 
     @Override
-    public void checkUserById(String userId){
-        this.getUserResourceById(userId).toRepresentation();
+    public void checkUserById(String userId) throws APIException{
+        try{
+            this.getUserResourceById(userId).toRepresentation();
+        }catch (Exception e){
+            if(e instanceof javax.ws.rs.WebApplicationException) {
+                String message = ((WebApplicationException)e).getResponse().getStatusInfo().getReasonPhrase();
+                int code = ((WebApplicationException)e).getResponse().getStatusInfo().getStatusCode();
+                throw new APIException("[user_id : "+userId+"] "+ message, HttpStatus.resolve(code));
+            }
+            throw e;
+        }
     }
 
 

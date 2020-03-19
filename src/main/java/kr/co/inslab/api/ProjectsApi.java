@@ -70,7 +70,7 @@ public interface ProjectsApi {
         method = RequestMethod.DELETE)
     ResponseEntity<Void> userIdProjectsProjectNameDelete(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
 ,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
-);
+) throws Exception;
 
 
     @ApiOperation(value = "프로젝트 정보 조회", nickname = "userIdProjectsProjectNameGet", notes = "", response = Project.class, tags={ "projects", })

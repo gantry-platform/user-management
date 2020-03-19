@@ -18,7 +18,7 @@ spec:
       serviceAccountName: user-management-account
       containers:
         - name: user
-          image: harbor.dev.gantry.ai/gantry/user-management:0.16
+          image: harbor.dev.gantry.ai/gantry/user-management:0.17
           ports:
           - containerPort: 8080
           args: ["--spring.profiles.active=dev"]

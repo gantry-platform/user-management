@@ -1,13 +1,16 @@
 package kr.co.inslab.service;
 
 
+import kr.co.inslab.exception.APIException;
 import kr.co.inslab.keycloak.AbstractKeyCloak;
 import kr.co.inslab.keycloak.KeyCloakAdmin;
 import kr.co.inslab.keycloak.KeyCloakStaticConfig;
 import kr.co.inslab.model.Project;
 import org.keycloak.representations.idm.GroupRepresentation;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.WebApplicationException;
 import java.util.List;
 
 @Service
@@ -33,16 +36,35 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
     }
 
     @Override
-    public void checkUserById(String userId){
-
-        this.getUserResourceById(userId).toRepresentation();
+    public void checkUserById(String userId) throws APIException{
+        try{
+            this.getUserResourceById(userId).toRepresentation();
+        }catch (Exception e){
+            if(e instanceof javax.ws.rs.WebApplicationException) {
+                String message = ((WebApplicationException)e).getResponse().getStatusInfo().getReasonPhrase();
+                int code = ((WebApplicationException)e).getResponse().getStatusInfo().getStatusCode();
+                throw new APIException("[user_id : "+userId+"] "+message, HttpStatus.resolve(code));
+            }
+            throw e;
+        }
     }
 
 
     @Override
-    public Project getProjectByProjectName(String projectName){
-        String groupPath = this.projectNameToGroupPath(projectName);
-        GroupRepresentation groupRepresentation = this.getGroupByGroupPath(groupPath);
+    public Project getProjectByProjectName(String projectName) throws APIException{
+        GroupRepresentation groupRepresentation = null;
+        String groupPath = this.projectNameToGroupPath(projectName);;
+        try{
+            groupRepresentation = this.getGroupByGroupPath(groupPath);
+        }catch (Exception e){
+            if(e instanceof javax.ws.rs.WebApplicationException) {
+                String message = ((WebApplicationException)e).getResponse().getStatusInfo().getReasonPhrase();
+                int code = ((WebApplicationException)e).getResponse().getStatusInfo().getStatusCode();
+                throw new APIException("[project_name : "+projectName+"] "+message, HttpStatus.resolve(code));
+            }
+            throw e;
+        }
+
         Project project = makeProjectInfo(groupRepresentation.getId());
         return project;
     }
@@ -72,6 +94,13 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
             isOwner = true;
         }
         return isOwner;
+    }
+
+    @Override
+    public void deleteProjectById(String projectName) {
+        String groupPath = this.projectNameToGroupPath(projectName);
+        GroupRepresentation groupRepresentation = this.getGroupByGroupPath(groupPath);
+        this.removeGroupById(groupRepresentation.getId());
     }
 
     private String projectNameToGroupPath(String projectName){

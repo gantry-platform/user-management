@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.WebApplicationException;
 import java.io.IOException;
 import java.util.List;
 
@@ -55,15 +56,28 @@ public class ProjectsApiController implements ProjectsApi {
     }
 
     public ResponseEntity<Void> userIdProjectsProjectNameDelete(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
-,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName) {
-        String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName) throws Exception{
+
+        projectService.checkUserById(userId);
+
+        projectService.getProjectByProjectName(projectName);
+
+        if(!projectService.isOwnerOfProject(userId,projectName)){
+            throw new APIException(userId+"is not the owner of project",HttpStatus.BAD_REQUEST);
+        }
+        projectService.deleteProjectById(projectName);
+
+        ResponseEntity<Void> res = new ResponseEntity<Void>(HttpStatus.OK);
+
+        return res;
     }
 
     public ResponseEntity<Project> userIdProjectsProjectNameGet(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
 ,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName) throws Exception{
         
         projectService.checkUserById(userId);
+
+        projectService.getProjectByProjectName(projectName);
 
         Boolean existsUserInProject = projectService.existsUserInProject(userId,projectName);
 
