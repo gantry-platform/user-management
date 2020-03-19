@@ -42,31 +42,32 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
             groupAttr.put(KeyCloakStaticConfig.DESCRIPTION,description);
         }
 
-        GroupRepresentation projectGroupRep = super.createGroup(projectName,groupAttr);
-        GroupRepresentation adminGroupRep = super.addSubGroup(projectGroupRep, adminGroupName);
-        GroupRepresentation opsGroupRep = super.addSubGroup(projectGroupRep, opsGroupName);
-        GroupRepresentation devGroupRep = super.addSubGroup(projectGroupRep, devGroupName);
-        super.addRoleToGroup(adminGroupRep, Role.ADMIN);
-        super.addRoleToGroup(opsGroupRep, Role.OPS);
-        super.addRoleToGroup(devGroupRep, Role.DEV);
-        super.joinGroup(projectGroupRep,userId);
-        super.joinGroup(adminGroupRep,userId);
+        GroupRepresentation projectGroupRep = this.createGroup(projectName,groupAttr);
+        GroupRepresentation adminGroupRep = this.addSubGroup(projectGroupRep, adminGroupName);
+        GroupRepresentation opsGroupRep = this.addSubGroup(projectGroupRep, opsGroupName);
+        GroupRepresentation devGroupRep = this.addSubGroup(projectGroupRep, devGroupName);
+        this.addRoleToGroup(adminGroupRep, Role.ADMIN);
+        this.addRoleToGroup(opsGroupRep, Role.OPS);
+        this.addRoleToGroup(devGroupRep, Role.DEV);
+        this.joinGroup(projectGroupRep,userId);
+        this.joinGroup(adminGroupRep,userId);
 
-        Project project = super.makeProjectInfo(projectGroupRep.getId());
+        Project project = this.makeProjectInfo(projectGroupRep.getId());
 
         return project;
     }
 
     @Override
-    public void checkUser(String userId) throws Exception {
-        super.getUserResourceById(userId).toRepresentation();
+    public void checkUserById(String userId) throws Exception {
+        this.getUserResourceById(userId).toRepresentation();
     }
+
 
     @Override
     public User getUserInfoById(String userId) throws Exception {
-        UserResource userResource = super.getUserResourceById(userId);
+        UserResource userResource = this.getUserResourceById(userId);
         UserRepresentation gantryUser = userResource.toRepresentation();
-        List<GroupRepresentation> gantryProjects = super.getGroupsByUserId(userId);
+        List<GroupRepresentation> gantryProjects = this.getGroupsByUserId(userId);
 
         User user = new User();
         user.setUserName(gantryUser.getUsername());

@@ -47,7 +47,7 @@ public class UsersApiController implements UsersApi {
     @Override
     public ResponseEntity<Project> usersUserIdProjectsPost(@Valid NewProject body, String userId) throws Exception {
 
-        userService.checkUser(userId);
+        userService.checkUserById(userId);
 
         String displayName = body.getDisplayName();
         String description = body.getDescription();

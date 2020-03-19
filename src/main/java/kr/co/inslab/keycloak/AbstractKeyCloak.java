@@ -37,7 +37,7 @@ public abstract class AbstractKeyCloak {
         return userRepresentations;
     }
 
-    protected UserResource getUserResourceById(String userId) throws KeyCloakAdminException {
+    protected UserResource getUserResourceById(String userId) throws KeyCloakAdminException{
         UserResource userResource = this.getRealm().users().get(userId);
         return userResource;
     }
@@ -92,6 +92,10 @@ public abstract class AbstractKeyCloak {
 
     protected GroupRepresentation getGroupByGroupId(String groupId) throws KeyCloakAdminException{
         GroupRepresentation groupRepresentation = this.getRealm().groups().group(groupId).toRepresentation();
+        return groupRepresentation;
+    }
+    protected GroupRepresentation getGroupByGroupPath(String groupPath) throws KeyCloakAdminException{
+        GroupRepresentation groupRepresentation = this.getRealm().getGroupByPath(groupPath);
         return groupRepresentation;
     }
 

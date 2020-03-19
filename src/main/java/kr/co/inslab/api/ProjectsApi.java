@@ -84,7 +84,7 @@ public interface ProjectsApi {
         method = RequestMethod.GET)
     ResponseEntity<Project> userIdProjectsProjectNameGet(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
 ,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
-);
+) throws Exception;
 
 
     @ApiOperation(value = "프로젝트의 전체 그룹정도(dev,ops,admin) 조회", nickname = "userIdProjectsProjectNameGroupsGet", notes = "", response = Group.class, responseContainer = "List", tags={ "projects", })
