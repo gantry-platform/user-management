@@ -72,7 +72,7 @@ public class ProjectsApiController implements ProjectsApi {
         }
 
         Project project = projectService.getProjectByProjectName(projectName);
-        ResponseEntity<Project> res = new ResponseEntity<Project>(project,HttpStatus.BAD_REQUEST);
+        ResponseEntity<Project> res = new ResponseEntity<Project>(project,HttpStatus.OK);
 
         return res;
     }
@@ -139,9 +139,21 @@ public class ProjectsApiController implements ProjectsApi {
     public ResponseEntity<Void> userIdProjectsProjectNamePatch(@ApiParam(value = "" ,required=true )  @Valid @RequestBody UpdateProject body
 ,@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
 ,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
-) {
-        String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+) throws Exception{
+
+        projectService.checkUserById(userId);
+        String owner = body.getOwner();
+        String description = body.getDescription();
+
+        if(!projectService.isOwnerOfProject(userId,projectName)){
+            throw new APIException(userId+"is not the owner of project",HttpStatus.BAD_REQUEST);
+        }
+
+        projectService.updateProjectInfo(projectName,owner,description);
+
+        ResponseEntity<Void> res = new ResponseEntity<Void>(HttpStatus.OK);
+
+        return res;
     }
 
 }

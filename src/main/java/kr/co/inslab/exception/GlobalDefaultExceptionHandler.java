@@ -43,8 +43,9 @@ public class GlobalDefaultExceptionHandler extends ResponseEntityExceptionHandle
         ex.printStackTrace();
         Error err = new Error();
         HttpStatus status = ((KeyCloakAdminException) ex).getHttpStatus();
+        String message = ((KeyCloakAdminException) ex).getMessage();
         err.setCode(status.toString());
-        err.setMessage(ex.getMessage());
+        err.setMessage(message);
         return new ResponseEntity<>(err,status);
     }
 
@@ -53,9 +54,10 @@ public class GlobalDefaultExceptionHandler extends ResponseEntityExceptionHandle
         ex.printStackTrace();
         Error err = new Error();
         int statusCode = ((WebApplicationException) ex).getResponse().getStatus();
+        String message = ((WebApplicationException) ex).getResponse().getStatusInfo().getReasonPhrase();
         HttpStatus status = HttpStatus.resolve(statusCode);
         err.setCode(status.toString());
-        err.setMessage(ex.getMessage());
+        err.setMessage(message);
         return new ResponseEntity<>(err,status);
     }
 

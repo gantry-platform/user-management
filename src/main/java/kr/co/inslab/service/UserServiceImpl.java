@@ -1,6 +1,8 @@
 package kr.co.inslab.service;
 
 
+import kr.co.inslab.exception.APIException;
+import kr.co.inslab.exception.KeyCloakAdminException;
 import kr.co.inslab.keycloak.*;
 import kr.co.inslab.model.Project;
 import kr.co.inslab.model.User;
@@ -27,7 +29,7 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
 
 
     @Override
-    public Project createProject(String userId, String displayName, String description) throws Exception {
+    public Project createProject(String userId, String displayName, String description) throws KeyCloakAdminException{
         String projectName = userId+"_"+displayName;
         String adminGroupName = SubGroup.ADMIN.name().toLowerCase();
         String opsGroupName = SubGroup.OPS.name().toLowerCase();
@@ -58,13 +60,13 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
     }
 
     @Override
-    public void checkUserById(String userId) throws Exception {
+    public void checkUserById(String userId){
         this.getUserResourceById(userId).toRepresentation();
     }
 
 
     @Override
-    public User getUserInfoById(String userId) throws Exception {
+    public User getUserInfoById(String userId){
         UserResource userResource = this.getUserResourceById(userId);
         UserRepresentation gantryUser = userResource.toRepresentation();
         List<GroupRepresentation> gantryProjects = this.getGroupsByUserId(userId);

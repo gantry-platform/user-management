@@ -32,22 +32,22 @@ public abstract class AbstractKeyCloak {
     }
 
 
-    protected List<UserRepresentation> getUserByEmail(String email) throws KeyCloakAdminException {
+    protected List<UserRepresentation> getUserByEmail(String email){
         List<UserRepresentation> userRepresentations= this.getRealm().users().search(null,null,null,email,0,10);
         return userRepresentations;
     }
 
-    protected UserResource getUserResourceById(String userId) throws KeyCloakAdminException{
+    protected UserResource getUserResourceById(String userId) {
         UserResource userResource = this.getRealm().users().get(userId);
         return userResource;
     }
 
-    protected List<UserRepresentation> getMembersByGroupId(String groupId) throws KeyCloakAdminException{
+    protected List<UserRepresentation> getMembersByGroupId(String groupId) {
         List<UserRepresentation> userRepresentations = this.getRealm().groups().group(groupId).members();
         return userRepresentations;
     }
 
-    protected GroupRepresentation createGroup(String groupName, Map<String,String> groupAttr) throws KeyCloakAdminException{
+    protected GroupRepresentation createGroup(String groupName, Map<String,String> groupAttr) throws KeyCloakAdminException {
 
         GroupRepresentation groupRepresentation = new GroupRepresentation();
         groupRepresentation.setName(groupName);
@@ -65,7 +65,7 @@ public abstract class AbstractKeyCloak {
         return groupRepresentation;
     }
 
-    protected GroupRepresentation addSubGroup(GroupRepresentation topGroup,String subGroupName) throws KeyCloakAdminException{
+    protected GroupRepresentation addSubGroup(GroupRepresentation topGroup,String subGroupName) throws KeyCloakAdminException {
 
         GroupRepresentation groupRepresentation = new GroupRepresentation();
         groupRepresentation.setName(subGroupName);
@@ -77,11 +77,11 @@ public abstract class AbstractKeyCloak {
         return groupRepresentation;
     }
 
-    protected void joinGroup(GroupRepresentation joinGroup,String userId) throws KeyCloakAdminException{
+    protected void joinGroup(GroupRepresentation joinGroup,String userId) {
         this.getRealm().users().get(userId).joinGroup(joinGroup.getId());
     }
 
-    protected void addRoleToGroup(GroupRepresentation targetGroup,Role role) throws KeyCloakAdminException{
+    protected void addRoleToGroup(GroupRepresentation targetGroup,Role role) {
         RoleResource roleResource = this.getRealm().roles().get(role.name().toLowerCase());
         RoleRepresentation roleRepresentation = roleResource.toRepresentation();
         List<RoleRepresentation> roleRepresentations = new ArrayList<RoleRepresentation>();
@@ -90,18 +90,22 @@ public abstract class AbstractKeyCloak {
     }
 
 
-    protected GroupRepresentation getGroupByGroupId(String groupId) throws KeyCloakAdminException{
+    protected GroupRepresentation getGroupByGroupId(String groupId) {
         GroupRepresentation groupRepresentation = this.getRealm().groups().group(groupId).toRepresentation();
         return groupRepresentation;
     }
-    protected GroupRepresentation getGroupByGroupPath(String groupPath) throws KeyCloakAdminException{
+    protected GroupRepresentation getGroupByGroupPath(String groupPath) {
         GroupRepresentation groupRepresentation = this.getRealm().getGroupByPath(groupPath);
         return groupRepresentation;
     }
 
-    protected List<GroupRepresentation> getGroupsByUserId(String userId) throws KeyCloakAdminException {
+    protected List<GroupRepresentation> getGroupsByUserId(String userId) {
         List<GroupRepresentation> groupRepresentations = this.getRealm().users().get(userId).groups();
         return groupRepresentations;
+    }
+
+    protected void updateGroup(String groupId, GroupRepresentation groupRepresentation){
+        this.getRealm().groups().group(groupId).update(groupRepresentation);
     }
 
     protected RealmResource getRealm(){
@@ -115,7 +119,7 @@ public abstract class AbstractKeyCloak {
             Response.StatusType statusInfo = response.getStatusInfo();
             response.bufferEntity();
             String body = response.readEntity(String.class);
-            throw new KeyCloakAdminException(statusInfo.toString(),HttpStatus.resolve(statusInfo.getStatusCode()));
+            throw new KeyCloakAdminException(statusInfo.getReasonPhrase(),HttpStatus.resolve(statusInfo.getStatusCode()));
         }
         if (location == null) {
             return null;
@@ -124,7 +128,7 @@ public abstract class AbstractKeyCloak {
         return path.substring(path.lastIndexOf('/') + 1);
     }
 
-    protected Project makeProjectInfo(String topGroupId) throws KeyCloakAdminException {
+    protected Project makeProjectInfo(String topGroupId) {
         Project project = null;
         GroupRepresentation groupRepresentation = this.getGroupByGroupId(topGroupId);
         List<GroupRepresentation> subGroups = groupRepresentation.getSubGroups();
@@ -137,7 +141,7 @@ public abstract class AbstractKeyCloak {
         return project;
     }
 
-    private List<Group> getSubGroups(List<GroupRepresentation> subGroups) throws KeyCloakAdminException {
+    private List<Group> getSubGroups(List<GroupRepresentation> subGroups) {
 
         List<Group> groups = new ArrayList<Group>();
         for (GroupRepresentation gantryGroup : subGroups) {
@@ -149,7 +153,7 @@ public abstract class AbstractKeyCloak {
         return groups;
     }
 
-    private List<Member> getMembers(Group group, String groupId) throws KeyCloakAdminException {
+    private List<Member> getMembers(Group group, String groupId) {
         List<Member> members = null;
         List<UserRepresentation> gantryMembers = this.getMembersByGroupId(groupId);
         if (gantryMembers.size() > 0) {

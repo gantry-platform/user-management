@@ -177,6 +177,6 @@ public interface ProjectsApi {
     ResponseEntity<Void> userIdProjectsProjectNamePatch(@ApiParam(value = "" ,required=true )  @Valid @RequestBody UpdateProject body
 ,@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
 ,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
-);
+) throws Exception;
 
 }
