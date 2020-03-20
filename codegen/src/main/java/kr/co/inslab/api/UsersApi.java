@@ -26,23 +26,23 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-03-16T09:54:20.497+09:00[Asia/Seoul]")
-@Api(value = "users", description = "the users API")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-03-20T14:33:40.274+09:00[Asia/Seoul]")
+@Api(value = "Users", description = "the Users API")
 public interface UsersApi {
 
-
     @ApiOperation(value = "유저 정보 조회", nickname = "usersUserIdGet", notes = "", response = User.class, tags={ "users", })
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success", response = User.class),
-            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-            @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-            @ApiResponse(code = 404, message = "Not Found", response = Error.class) })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Success", response = User.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class) })
     @RequestMapping(value = "/users/{user_id}",
-            produces = { "application/json" },
-            method = RequestMethod.GET)
+        produces = { "application/json" }, 
+        method = RequestMethod.GET)
     ResponseEntity<User> usersUserIdGet(@ApiParam(value = "user_id(not name)",required=true) @PathVariable("user_id") String userId
-            ,@ApiParam(value = "프로젝트 정보까지 포함") @Valid @RequestParam(value = "project_info", required = false) Boolean projectInfo
-    )throws Exception;
+,@ApiParam(value = "프로젝트 정보까지 포함") @Valid @RequestParam(value = "project_info", required = false) Boolean projectInfo
+);
+
 
     @ApiOperation(value = "신규 프로젝트 생성", nickname = "usersUserIdProjectsPost", notes = "", response = Project.class, tags={ "users", })
     @ApiResponses(value = { 
@@ -57,6 +57,6 @@ public interface UsersApi {
         method = RequestMethod.POST)
     ResponseEntity<Project> usersUserIdProjectsPost(@ApiParam(value = "" ,required=true )  @Valid @RequestBody NewProject body
 ,@ApiParam(value = "user_id(not name)",required=true) @PathVariable("user_id") String userId
-)throws  Exception;
+);
 
 }

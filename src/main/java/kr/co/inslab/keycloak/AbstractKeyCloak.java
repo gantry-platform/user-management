@@ -167,8 +167,25 @@ public abstract class AbstractKeyCloak {
         }
         return project;
     }
+    protected Project makeProjectMetaInfo(GroupRepresentation groupRepresentation) {
+        Project project = null;
+        List<GroupRepresentation> subGroups = groupRepresentation.getSubGroups();
+        if (subGroups != null && subGroups.size() > 0) {
+            project = new Project();
+            project.setName(groupRepresentation.getName());
+            Map<String, List<String>> groupAttrs = groupRepresentation.getAttributes();
 
-
+            if (groupAttrs != null) {
+                for (String key : groupAttrs.keySet()) {
+                    switch (key) {
+                        case KeyCloakStaticConfig.DISPLAY_NAME:
+                            project.setDisplayName(groupAttrs.get(key).get(0));
+                    }
+                }
+            }
+        }
+        return project;
+    }
     private List<Group> addSubGroupsInfo(List<GroupRepresentation> subGroups) {
 
         List<Group> groups = new ArrayList<Group>();

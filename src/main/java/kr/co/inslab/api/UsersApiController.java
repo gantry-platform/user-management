@@ -35,9 +35,11 @@ public class UsersApiController implements UsersApi {
     }
 
     @Override
-    public ResponseEntity<User> usersUserIdGet(String userId) throws Exception{
-
-        User user = userService.getUserInfoById(userId);
+    public ResponseEntity<User> usersUserIdGet(String userId,Boolean projectInfo) throws Exception{
+        if(projectInfo==null){
+            projectInfo=false;
+        }
+        User user = userService.getUserInfoById(userId,projectInfo);
         ResponseEntity<User> res = new ResponseEntity<User>(user,HttpStatus.OK);
 
         return res;

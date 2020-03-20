@@ -80,7 +80,7 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
 
 
     @Override
-    public User getUserInfoById(String userId){
+    public User getUserInfoById(String userId,Boolean projectInfo){
         UserResource userResource = this.getUserResourceById(userId);
         UserRepresentation gantryUser = userResource.toRepresentation();
         List<GroupRepresentation> gantryProjects = this.getGroupsByUserId(userId);
@@ -97,7 +97,13 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
             List<Project> projects = new ArrayList<Project>();
             for(GroupRepresentation gantryProject: gantryProjects){
                 GroupRepresentation groupRepresentation = this.getGroupByGroupId(gantryProject.getId());
-                Project project = super.makeProjectInfo(groupRepresentation);
+                Project project = null;
+                if(projectInfo){
+                    project = this.makeProjectInfo(groupRepresentation);
+                }else{
+                    project = this.makeProjectMetaInfo(groupRepresentation);
+                }
+
                 if(project != null){
                     projects.add(project);
                 }

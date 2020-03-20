@@ -30,6 +30,12 @@ paths:
           description: user_id(not name)
           schema:
             type: string
+        - name: project_info
+          in: query
+          required: false
+          description: 프로젝트 정보까지 포함
+          schema:
+            type: boolean
       responses:
         '200':
           description: Success
