@@ -156,21 +156,20 @@ public abstract class AbstractKeyCloak {
 
     protected Project makeProjectInfo(GroupRepresentation groupRepresentation) {
         Project project = null;
-        List<PendingUser> pendingUsers = null;
+        List<PendingUser> pendingUsers = this.addPendingUser(groupRepresentation.getId());
         List<GroupRepresentation> subGroups = groupRepresentation.getSubGroups();
         if (subGroups != null && subGroups.size() > 0) {
             project = new Project();
             project.setName(groupRepresentation.getName());
-            pendingUsers = this.addPendingUser(groupRepresentation.getId());
             this.setAdditionalProperties(groupRepresentation,project,pendingUsers);
-            project.setGroups(this.getSubGroups(subGroups));
+            project.setGroups(this.addSubGroupsInfo(subGroups));
             project.setPendingUsers(pendingUsers);
         }
         return project;
     }
 
 
-    private List<Group> getSubGroups(List<GroupRepresentation> subGroups) {
+    private List<Group> addSubGroupsInfo(List<GroupRepresentation> subGroups) {
 
         List<Group> groups = new ArrayList<Group>();
         for (GroupRepresentation gantryGroup : subGroups) {
@@ -199,6 +198,7 @@ public abstract class AbstractKeyCloak {
         return members;
     }
 
+
     private List<PendingUser> addPendingUser(String groupId) {
         List<PendingUser> pendingUsers = null;
         List<UserRepresentation> gantryMembers = this.getMembersByGroupId(groupId);
@@ -214,6 +214,7 @@ public abstract class AbstractKeyCloak {
         }
         return pendingUsers;
     }
+
 
 
     private void setAdditionalProperties(GroupRepresentation groupRepresentation,Project project,List<PendingUser> pendingUsers){

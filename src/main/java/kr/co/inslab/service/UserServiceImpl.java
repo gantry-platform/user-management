@@ -96,7 +96,8 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
         if (gantryProjects != null && gantryProjects.size() > 0){
             List<Project> projects = new ArrayList<Project>();
             for(GroupRepresentation gantryProject: gantryProjects){
-                Project project = super.makeProjectInfo(gantryProject);
+                GroupRepresentation groupRepresentation = this.getGroupByGroupId(gantryProject.getId());
+                Project project = super.makeProjectInfo(groupRepresentation);
                 if(project != null){
                     projects.add(project);
                 }
