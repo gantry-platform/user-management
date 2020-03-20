@@ -5,6 +5,7 @@ import kr.co.inslab.exception.APIException;
 import kr.co.inslab.exception.KeyCloakAdminException;
 import kr.co.inslab.keycloak.AbstractKeyCloak;
 import kr.co.inslab.keycloak.KeyCloakAdmin;
+import kr.co.inslab.keycloak.KeyCloakStaticConfig;
 import kr.co.inslab.model.Group;
 import kr.co.inslab.model.Member;
 import kr.co.inslab.model.Project;
@@ -17,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -175,7 +177,26 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
         this.joinGroup(memberId,groupId);
     }
 
+    private UserRepresentation createUser(String email) throws KeyCloakAdminException {
+        String [] splitEmail = email.split("@");
+        UserRepresentation userRepresentation = new UserRepresentation();
+        userRepresentation.setEmailVerified(false);
+        userRepresentation.setEnabled(true);
+        userRepresentation.setEmail(email);
+        userRepresentation.setUsername(splitEmail[1]);
 
+        List<String> actions = new ArrayList<String>();
+        actions.add(KeyCloakStaticConfig.UPDATE_PROFILE);
+        actions.add(KeyCloakStaticConfig.UPDATE_PASSWORD);
+        actions.add(KeyCloakStaticConfig.VERIFY_EMAIL);
+        userRepresentation.setRequiredActions(actions);
+
+        Response response = this.getRealm().users().create(userRepresentation);
+        String createdId = getCreatedId(response,email);
+        userRepresentation.setId(createdId);
+
+        return userRepresentation;
+    }
 
 
 }

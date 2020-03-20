@@ -116,29 +116,6 @@ public abstract class AbstractKeyCloak {
         return this.keyCloakAdmin.getInstance().realm(this.keyCloakAdmin.getTargetRealm());
     }
 
-    //TODO: 아래의 메소드 중 용도에 맞지 않는 메소드 이동
-
-    protected UserRepresentation createUser(String email) throws KeyCloakAdminException {
-        String [] splitEmail = email.split("@");
-        UserRepresentation userRepresentation = new UserRepresentation();
-        userRepresentation.setEmailVerified(false);
-        userRepresentation.setEnabled(true);
-        userRepresentation.setEmail(email);
-        userRepresentation.setUsername(splitEmail[1]);
-
-        List<String> actions = new ArrayList<String>();
-        actions.add(KeyCloakStaticConfig.UPDATE_PROFILE);
-        actions.add(KeyCloakStaticConfig.UPDATE_PASSWORD);
-        actions.add(KeyCloakStaticConfig.VERIFY_EMAIL);
-        userRepresentation.setRequiredActions(actions);
-
-        Response response = this.getRealm().users().create(userRepresentation);
-        String createdId = getCreatedId(response,email);
-        userRepresentation.setId(createdId);
-
-        return userRepresentation;
-    }
-
     protected void removeGroupById(String groupId){
         this.getRealm().groups().group(groupId).remove();
     }
@@ -173,6 +150,7 @@ public abstract class AbstractKeyCloak {
         }
         return project;
     }
+
     protected Project makeProjectMetaInfo(GroupRepresentation groupRepresentation) {
         Project project = null;
         List<GroupRepresentation> subGroups = groupRepresentation.getSubGroups();
@@ -239,8 +217,6 @@ public abstract class AbstractKeyCloak {
         }
         return pendingUsers;
     }
-
-
 
     private void setAdditionalProperties(GroupRepresentation groupRepresentation,Project project,List<PendingUser> pendingUsers){
         Map<String, List<String>> groupAttrs = groupRepresentation.getAttributes();
