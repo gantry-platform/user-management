@@ -8,4 +8,5 @@ public class KeyCloakStaticConfig {
     public final static String DESCRIPTION="description";
     public final static String OWNER="owner";
     public final static String STATUS="status";
+    public final static String PENDING="pending";
 }

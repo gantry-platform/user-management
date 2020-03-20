@@ -3,6 +3,7 @@ package kr.co.inslab.keycloak;
 import kr.co.inslab.exception.KeyCloakAdminException;
 import kr.co.inslab.model.Group;
 import kr.co.inslab.model.Member;
+import kr.co.inslab.model.PendingUser;
 import kr.co.inslab.model.Project;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.RoleResource;
@@ -112,6 +113,27 @@ public abstract class AbstractKeyCloak {
         return this.keyCloakAdmin.getInstance().realm(this.keyCloakAdmin.getTargetRealm());
     }
 
+    protected UserRepresentation createUser(String email) throws KeyCloakAdminException {
+        String [] splitEmail = email.split("@");
+        UserRepresentation userRepresentation = new UserRepresentation();
+        userRepresentation.setEmailVerified(false);
+        userRepresentation.setEnabled(true);
+        userRepresentation.setEmail(email);
+        userRepresentation.setUsername(splitEmail[1]);
+
+        List<String> actions = new ArrayList<String>();
+        actions.add(KeyCloakStaticConfig.UPDATE_PROFILE);
+        actions.add(KeyCloakStaticConfig.UPDATE_PASSWORD);
+        actions.add(KeyCloakStaticConfig.VERIFY_EMAIL);
+        userRepresentation.setRequiredActions(actions);
+
+        Response response = this.getRealm().users().create(userRepresentation);
+        String createdId = getCreatedId(response);
+        userRepresentation.setId(createdId);
+
+        return userRepresentation;
+    }
+
     protected void removeGroupById(String groupId){
         this.getRealm().groups().group(groupId).remove();
     }
@@ -132,18 +154,21 @@ public abstract class AbstractKeyCloak {
         return path.substring(path.lastIndexOf('/') + 1);
     }
 
-    protected Project makeProjectInfo(String topGroupId) {
+    protected Project makeProjectInfo(GroupRepresentation groupRepresentation) {
         Project project = null;
-        GroupRepresentation groupRepresentation = this.getGroupByGroupId(topGroupId);
+        List<PendingUser> pendingUsers = null;
         List<GroupRepresentation> subGroups = groupRepresentation.getSubGroups();
         if (subGroups != null && subGroups.size() > 0) {
             project = new Project();
             project.setName(groupRepresentation.getName());
-            this.setAdditionalProperties(groupRepresentation, project);
+            pendingUsers = this.addPendingUser(groupRepresentation.getId());
+            this.setAdditionalProperties(groupRepresentation,project,pendingUsers);
             project.setGroups(this.getSubGroups(subGroups));
+            project.setPendingUsers(pendingUsers);
         }
         return project;
     }
+
 
     private List<Group> getSubGroups(List<GroupRepresentation> subGroups) {
 
@@ -151,13 +176,13 @@ public abstract class AbstractKeyCloak {
         for (GroupRepresentation gantryGroup : subGroups) {
             Group group = new Group();
             group.setName(gantryGroup.getName());
-            group.setMembers(this.getMembers(group,gantryGroup.getId()));
+            group.setMembers(this.getMembers(gantryGroup.getId()));
             groups.add(group);
         }
         return groups;
     }
 
-    private List<Member> getMembers(Group group, String groupId) {
+    private List<Member> getMembers(String groupId) {
         List<Member> members = null;
         List<UserRepresentation> gantryMembers = this.getMembersByGroupId(groupId);
         if (gantryMembers.size() > 0) {
@@ -174,8 +199,26 @@ public abstract class AbstractKeyCloak {
         return members;
     }
 
-    private void setAdditionalProperties(GroupRepresentation groupRepresentation,Project project){
+    private List<PendingUser> addPendingUser(String groupId) {
+        List<PendingUser> pendingUsers = null;
+        List<UserRepresentation> gantryMembers = this.getMembersByGroupId(groupId);
+        if (gantryMembers.size() > 0) {
+            pendingUsers = new ArrayList<PendingUser>();
+            for (UserRepresentation gantryMember : gantryMembers) {
+                if(!gantryMember.isEmailVerified()){
+                    PendingUser pendingUser = new PendingUser();
+                    pendingUser.setEmail(gantryMember.getEmail());
+                    pendingUsers.add(pendingUser);
+                }
+            }
+        }
+        return pendingUsers;
+    }
+
+
+    private void setAdditionalProperties(GroupRepresentation groupRepresentation,Project project,List<PendingUser> pendingUsers){
         Map<String, List<String>> groupAttrs = groupRepresentation.getAttributes();
+
         if (groupAttrs != null){
             for(String key : groupAttrs.keySet()){
                 switch (key){
@@ -190,6 +233,18 @@ public abstract class AbstractKeyCloak {
                         break;
                     case KeyCloakStaticConfig.STATUS:
                         project.setStatus(Project.StatusEnum.fromValue(groupAttrs.get(key).get(0)));
+                        break;
+                    case KeyCloakStaticConfig.PENDING:
+                        if(pendingUsers == null){
+                            pendingUsers = new ArrayList<PendingUser>();
+                        }
+                        List<String> pendingEmails = groupAttrs.get(key);
+                        for(String email:pendingEmails){
+                            PendingUser pendingUser = new PendingUser();
+                            pendingUser.setEmail(email);
+                            pendingUsers.add(pendingUser);
+                        }
+                        project.setPendingUsers(pendingUsers);
                         break;
                     default:
                         logger.warn("New Attr Key:"+key);

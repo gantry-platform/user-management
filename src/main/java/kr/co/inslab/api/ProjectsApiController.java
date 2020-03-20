@@ -1,6 +1,7 @@
 package kr.co.inslab.api;
 
 import kr.co.inslab.exception.APIException;
+import kr.co.inslab.exception.KeyCloakAdminException;
 import kr.co.inslab.keycloak.KeyCloakStaticConfig;
 import kr.co.inslab.model.Group;
 import kr.co.inslab.model.Member;
@@ -48,7 +49,7 @@ public class ProjectsApiController implements ProjectsApi {
 
     public ResponseEntity<Void> userIdProjectsProjectNameActivePut(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
 ,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName) throws Exception{
-
+        ResponseEntity<Void> res = null;
         this.checkResource(userId,projectName);
 
         Map<String,String> attrs = new HashMap<String, String>();
@@ -56,7 +57,7 @@ public class ProjectsApiController implements ProjectsApi {
 
         projectService.updateProjectInfo(projectName,attrs);
 
-        ResponseEntity<Void> res = new ResponseEntity<Void>(HttpStatus.OK);
+        res = new ResponseEntity<Void>(HttpStatus.OK);
 
         return res;
 
@@ -65,19 +66,22 @@ public class ProjectsApiController implements ProjectsApi {
     public ResponseEntity<Void> userIdProjectsProjectNameArchivePut(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
 ,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName) throws Exception{
         this.checkResource(userId,projectName);
-
+        ResponseEntity<Void> res = null;
         Map<String,String> attrs = new HashMap<String, String>();
+
         attrs.put(KeyCloakStaticConfig.STATUS,Project.StatusEnum.ARCHIVE.toString());
 
         projectService.updateProjectInfo(projectName,attrs);
 
-        ResponseEntity<Void> res = new ResponseEntity<Void>(HttpStatus.OK);
+        res = new ResponseEntity<Void>(HttpStatus.OK);
 
         return res;
     }
 
     public ResponseEntity<Void> userIdProjectsProjectNameDelete(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
 ,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName) throws Exception{
+
+        ResponseEntity<Void> res = null;
 
         this.checkResource(userId,projectName);
 
@@ -86,14 +90,14 @@ public class ProjectsApiController implements ProjectsApi {
         }
         projectService.deleteProjectById(projectName);
 
-        ResponseEntity<Void> res = new ResponseEntity<Void>(HttpStatus.OK);
+        res = new ResponseEntity<Void>(HttpStatus.OK);
 
         return res;
     }
 
     public ResponseEntity<Project> userIdProjectsProjectNameGet(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
 ,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName) throws Exception{
-
+        ResponseEntity<Project> res = null;
         this.checkResource(userId,projectName);
 
         Boolean existsUserInProject = projectService.existsUserInProject(userId,projectName);
@@ -103,25 +107,21 @@ public class ProjectsApiController implements ProjectsApi {
         }
 
         Project project = projectService.getProjectByProjectName(projectName);
-        ResponseEntity<Project> res = new ResponseEntity<Project>(project,HttpStatus.OK);
-
+        res = new ResponseEntity<Project>(project,HttpStatus.OK);
         return res;
     }
 
     public ResponseEntity<List<Group>> userIdProjectsProjectNameGroupsGet(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
 ,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
-) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<List<Group>>(objectMapper.readValue("[ {\n  \"members\" : [ {\n    \"name\" : \"name\",\n    \"id\" : \"id\",\n    \"email\" : \"email\"\n  }, {\n    \"name\" : \"name\",\n    \"id\" : \"id\",\n    \"email\" : \"email\"\n  } ],\n  \"name\" : \"name\",\n  \"display_name\" : \"display_name\"\n}, {\n  \"members\" : [ {\n    \"name\" : \"name\",\n    \"id\" : \"id\",\n    \"email\" : \"email\"\n  }, {\n    \"name\" : \"name\",\n    \"id\" : \"id\",\n    \"email\" : \"email\"\n  } ],\n  \"name\" : \"name\",\n  \"display_name\" : \"display_name\"\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<Group>>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+) throws Exception{
+        ResponseEntity<List<Group>> res = null;
 
-        return new ResponseEntity<List<Group>>(HttpStatus.NOT_IMPLEMENTED);
+        this.checkResource(userId,projectName);
+
+        List<Group> groups = projectService.getGroupsByProjectName(projectName);
+
+        res = new ResponseEntity<List<Group>>(groups,HttpStatus.OK);
+        return res;
     }
 
     public ResponseEntity<List<Member>> userIdProjectsProjectNameGroupsGroupNameMembersGet(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
@@ -150,13 +150,17 @@ public class ProjectsApiController implements ProjectsApi {
         return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<Void> userIdProjectsProjectNameGroupsGroupNamePut(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
+    public ResponseEntity<Void> userIdProjectsProjectNameGroupsGroupNameInvitationPut(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
 ,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
 ,@ApiParam(value = "group_name",required=true) @PathVariable("group_name") String groupName
 ,@NotNull @ApiParam(value = "email", required = true) @Valid @RequestParam(value = "email", required = true) String email
-) {
-        String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+) throws APIException, KeyCloakAdminException {
+        ResponseEntity<Void> res = null;
+
+        this.checkResource(userId,projectName);
+        projectService.inviteUserToGroup(email,projectName,groupName);
+
+        return res;
     }
 
     public ResponseEntity<Void> userIdProjectsProjectNameMembersMemberIdDelete(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
@@ -171,7 +175,7 @@ public class ProjectsApiController implements ProjectsApi {
 ,@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
 ,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
 ) throws Exception{
-
+        ResponseEntity<Void> res = null;
         Map<String,String> attrs = null;
         String owner = body.getOwner();
         String description = body.getDescription();
@@ -192,14 +196,14 @@ public class ProjectsApiController implements ProjectsApi {
 
         projectService.updateProjectInfo(projectName,attrs);
 
-        ResponseEntity<Void> res = new ResponseEntity<Void>(HttpStatus.OK);
+        res = new ResponseEntity<Void>(HttpStatus.OK);
 
         return res;
     }
 
     private void checkResource(String userId,String projectName) throws APIException {
         projectService.checkUserById(userId);
-        projectService.getProjectByProjectName(projectName);
+        projectService.checkProjectByProjectName(projectName);
     }
 
 }

@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import kr.co.inslab.model.Group;
+import kr.co.inslab.model.PendingUser;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -17,7 +18,7 @@ import javax.validation.constraints.*;
  * Project
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-03-16T09:54:20.497+09:00[Asia/Seoul]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-03-20T09:52:19.240+09:00[Asia/Seoul]")
 public class Project   {
   @JsonProperty("name")
   private String name = null;
@@ -67,6 +68,10 @@ public class Project   {
   @JsonProperty("groups")
   @Valid
   private List<Group> groups = null;
+
+  @JsonProperty("pending_users")
+  @Valid
+  private List<PendingUser> pendingUsers = null;
 
   public Project name(String name) {
     this.name = name;
@@ -190,6 +195,33 @@ public class Project   {
     this.groups = groups;
   }
 
+  public Project pendingUsers(List<PendingUser> pendingUsers) {
+    this.pendingUsers = pendingUsers;
+    return this;
+  }
+
+  public Project addPendingUsersItem(PendingUser pendingUsersItem) {
+    if (this.pendingUsers == null) {
+      this.pendingUsers = new ArrayList<PendingUser>();
+    }
+    this.pendingUsers.add(pendingUsersItem);
+    return this;
+  }
+
+  /**
+   * Get pendingUsers
+   * @return pendingUsers
+  **/
+  @ApiModelProperty(value = "")
+      @Valid
+    public List<PendingUser> getPendingUsers() {
+    return pendingUsers;
+  }
+
+  public void setPendingUsers(List<PendingUser> pendingUsers) {
+    this.pendingUsers = pendingUsers;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -205,12 +237,13 @@ public class Project   {
         Objects.equals(this.description, project.description) &&
         Objects.equals(this.owner, project.owner) &&
         Objects.equals(this.status, project.status) &&
-        Objects.equals(this.groups, project.groups);
+        Objects.equals(this.groups, project.groups) &&
+        Objects.equals(this.pendingUsers, project.pendingUsers);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, displayName, description, owner, status, groups);
+    return Objects.hash(name, displayName, description, owner, status, groups, pendingUsers);
   }
 
   @Override
@@ -224,6 +257,7 @@ public class Project   {
     sb.append("    owner: ").append(toIndentedString(owner)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    groups: ").append(toIndentedString(groups)).append("\n");
+    sb.append("    pendingUsers: ").append(toIndentedString(pendingUsers)).append("\n");
     sb.append("}");
     return sb.toString();
   }

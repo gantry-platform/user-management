@@ -2,11 +2,16 @@ package kr.co.inslab.service;
 
 
 import kr.co.inslab.exception.APIException;
+import kr.co.inslab.exception.KeyCloakAdminException;
 import kr.co.inslab.keycloak.AbstractKeyCloak;
 import kr.co.inslab.keycloak.KeyCloakAdmin;
-import kr.co.inslab.keycloak.KeyCloakStaticConfig;
+import kr.co.inslab.model.Group;
 import kr.co.inslab.model.Project;
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.GroupRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +21,8 @@ import java.util.Map;
 
 @Service
 public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectService {
+
+    private final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
     public ProjectServiceImpl(KeyCloakAdmin keyCloakAdmin) {
         super(keyCloakAdmin);
@@ -66,7 +73,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
             throw e;
         }
 
-        Project project = makeProjectInfo(groupRepresentation.getId());
+        Project project = makeProjectInfo(groupRepresentation);
         return project;
     }
 
@@ -90,7 +97,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
         Boolean isOwner = false;
         String groupPath = this.projectNameToGroupPath(projectName);
         GroupRepresentation groupRepresentation = this.getGroupByGroupPath(groupPath);
-        Project project = this.makeProjectInfo(groupRepresentation.getId());
+        Project project = this.makeProjectInfo(groupRepresentation);
         if (project.getOwner().equals(userId)){
             isOwner = true;
         }
@@ -103,6 +110,44 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
         GroupRepresentation groupRepresentation = this.getGroupByGroupPath(groupPath);
         this.removeGroupById(groupRepresentation.getId());
     }
+
+    @Override
+    public List<Group> getGroupsByProjectName(String projectName) throws APIException{
+        List<Group> groups = null;
+        Project project = this.getProjectByProjectName(projectName);
+        groups = project.getGroups();
+        return groups;
+    }
+
+    @Override
+    public void inviteUserToGroup(String email,String projectName,String groupName) throws KeyCloakAdminException{
+
+        List<UserRepresentation> userRepresentations = this.getUserByEmail(email);
+
+        //New User
+        if(userRepresentations == null || userRepresentations.size() == 0){
+            String groupPath = projectNameToGroupPath(projectName);
+            String subGroupPath = groupPath+"/"+groupName;
+            logger.debug("subGroupPath:"+subGroupPath);
+            GroupRepresentation topGroup = this.getGroupByGroupPath(groupPath);
+            GroupRepresentation subGroup = this.getGroupByGroupPath(subGroupPath);
+            UserRepresentation userRepresentation = this.createUser(email);
+            UserResource userResource = this.getUserResourceById(userRepresentation.getId());
+            this.joinGroup(topGroup,userRepresentation.getId());
+            this.joinGroup(subGroup,userRepresentation.getId());
+            userResource.sendVerifyEmail();
+        //Exists USer
+        }else{
+
+        }
+    }
+
+    @Override
+    public void checkProjectByProjectName(String projectName) {
+        String groupPath = this.projectNameToGroupPath(projectName);
+        this.getGroupByGroupPath(groupPath);
+    }
+
 
     private String projectNameToGroupPath(String projectName){
         String groupPath = "/"+projectName;

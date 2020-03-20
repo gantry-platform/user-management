@@ -5,6 +5,8 @@
  */
 package kr.co.inslab.api;
 
+import kr.co.inslab.exception.APIException;
+import kr.co.inslab.exception.KeyCloakAdminException;
 import kr.co.inslab.model.Error;
 import kr.co.inslab.model.Group;
 import kr.co.inslab.model.Member;
@@ -98,7 +100,7 @@ public interface ProjectsApi {
         method = RequestMethod.GET)
     ResponseEntity<List<Group>> userIdProjectsProjectNameGroupsGet(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
 ,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
-);
+) throws Exception;
 
 
     @ApiOperation(value = "특정 프로젝트의 전체 맴버를 조회한다.", nickname = "userIdProjectsProjectNameGroupsGroupNameMembersGet", notes = "", response = Member.class, responseContainer = "List", tags={ "projects", })
@@ -132,21 +134,21 @@ public interface ProjectsApi {
 );
 
 
-    @ApiOperation(value = "특정 그룹으로 맴버초대", nickname = "userIdProjectsProjectNameGroupsGroupNamePut", notes = "", tags={ "projects", })
+    @ApiOperation(value = "특정 그룹으로 맴버초대", nickname = "userIdProjectsProjectNameGroupsGroupNameInvitationPut", notes = "", tags={ "projects", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Success"),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 409, message = "Conflict", response = Error.class) })
-    @RequestMapping(value = "/{user_id}/projects/{project_name}/groups/{group_name}",
+    @RequestMapping(value = "/{user_id}/projects/{project_name}/groups/{group_name}/invitation",
         produces = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<Void> userIdProjectsProjectNameGroupsGroupNamePut(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
+    ResponseEntity<Void> userIdProjectsProjectNameGroupsGroupNameInvitationPut(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
 ,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
 ,@ApiParam(value = "group_name",required=true) @PathVariable("group_name") String groupName
 ,@NotNull @ApiParam(value = "email", required = true) @Valid @RequestParam(value = "email", required = true) String email
-);
+) throws APIException,KeyCloakAdminException;
 
 
     @ApiOperation(value = "특정 맴버를 프로젝트에서 삭제한다.(그룹이 아니라 프로젝트임)", nickname = "userIdProjectsProjectNameMembersMemberIdDelete", notes = "", tags={ "projects", })

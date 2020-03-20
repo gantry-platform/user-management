@@ -351,7 +351,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /{user_id}/projects/{project_name}/groups/{group_name}:
+  /{user_id}/projects/{project_name}/groups/{group_name}/invitation:
     put:
       summary: 특정 그룹으로 맴버초대
       tags:
@@ -597,6 +597,17 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Group"
+        pending_users:
+          type: array
+          items:
+            $ref: "#/components/schemas/PendingUser"
+
+    PendingUser:
+      type: object
+      properties:
+        email:
+          type: string
+
     Group:
       type: object
       properties:
@@ -645,6 +656,4 @@ components:
           type: string
         message:
           type: string
-
-
 
