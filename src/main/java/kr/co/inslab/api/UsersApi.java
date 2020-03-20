@@ -41,7 +41,7 @@ public interface UsersApi {
             produces = { "application/json" },
             method = RequestMethod.GET)
     ResponseEntity<User> usersUserIdGet(@ApiParam(value = "user_id(not name)",required=true) @PathVariable("user_id") String userId
-            ,@ApiParam(value = "프로젝트 정보까지 포함") @Valid @RequestParam(value = "project_info", required = false) Boolean projectInfo
+            ,@ApiParam(value = "프로젝트 정보까지 포함") @Valid @RequestParam(value = "include_project", required = false) Boolean includeProject
     )throws Exception;
 
     @ApiOperation(value = "신규 프로젝트 생성", nickname = "usersUserIdProjectsPost", notes = "", response = Project.class, tags={ "users", })

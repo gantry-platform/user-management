@@ -18,8 +18,11 @@ import javax.validation.constraints.*;
  * Project
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-03-20T09:52:19.240+09:00[Asia/Seoul]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-03-20T16:37:02.439+09:00[Asia/Seoul]")
 public class Project   {
+  @JsonProperty("id")
+  private String id = null;
+
   @JsonProperty("name")
   private String name = null;
 
@@ -72,6 +75,25 @@ public class Project   {
   @JsonProperty("pending_users")
   @Valid
   private List<PendingUser> pendingUsers = null;
+
+  public Project id(String id) {
+    this.id = id;
+    return this;
+  }
+
+  /**
+   * Get id
+   * @return id
+  **/
+  @ApiModelProperty(value = "")
+  
+    public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
 
   public Project name(String name) {
     this.name = name;
@@ -232,7 +254,8 @@ public class Project   {
       return false;
     }
     Project project = (Project) o;
-    return Objects.equals(this.name, project.name) &&
+    return Objects.equals(this.id, project.id) &&
+        Objects.equals(this.name, project.name) &&
         Objects.equals(this.displayName, project.displayName) &&
         Objects.equals(this.description, project.description) &&
         Objects.equals(this.owner, project.owner) &&
@@ -243,7 +266,7 @@ public class Project   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, displayName, description, owner, status, groups, pendingUsers);
+    return Objects.hash(id, name, displayName, description, owner, status, groups, pendingUsers);
   }
 
   @Override
@@ -251,6 +274,7 @@ public class Project   {
     StringBuilder sb = new StringBuilder();
     sb.append("class Project {\n");
     
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");

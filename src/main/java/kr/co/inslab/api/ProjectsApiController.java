@@ -47,140 +47,122 @@ public class ProjectsApiController implements ProjectsApi {
         this.projectService = projectService;
     }
 
-    public ResponseEntity<Void> userIdProjectsProjectNameActivePut(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
-,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName) throws Exception{
+    private void checkResource(String userId,String projectId) throws APIException {
+        projectService.checkUserById(userId);
+        projectService.checkProjectByProjectId(projectId);
+    }
+
+    @Override
+    public ResponseEntity<Void> userIdProjectsProjectIdActivePut(String userId, String projectId) throws Exception {
         ResponseEntity<Void> res = null;
-        this.checkResource(userId,projectName);
+        this.checkResource(userId,projectId);
 
         Map<String,String> attrs = new HashMap<String, String>();
         attrs.put(KeyCloakStaticConfig.STATUS,Project.StatusEnum.ACTIVE.toString());
 
-        projectService.updateProjectInfo(projectName,attrs);
+        projectService.updateProjectInfo(projectId,attrs);
 
         res = new ResponseEntity<Void>(HttpStatus.OK);
 
         return res;
-
     }
 
-    public ResponseEntity<Void> userIdProjectsProjectNameArchivePut(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
-,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName) throws Exception{
-        this.checkResource(userId,projectName);
+    @Override
+    public ResponseEntity<Void> userIdProjectsProjectIdArchivePut(String userId, String projectId) throws Exception {
+        this.checkResource(userId,projectId);
         ResponseEntity<Void> res = null;
         Map<String,String> attrs = new HashMap<String, String>();
 
         attrs.put(KeyCloakStaticConfig.STATUS,Project.StatusEnum.ARCHIVE.toString());
 
-        projectService.updateProjectInfo(projectName,attrs);
+        projectService.updateProjectInfo(projectId,attrs);
 
         res = new ResponseEntity<Void>(HttpStatus.OK);
 
         return res;
     }
 
-    public ResponseEntity<Void> userIdProjectsProjectNameDelete(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
-,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName) throws Exception{
-
-        ResponseEntity<Void> res = null;
-
-        this.checkResource(userId,projectName);
-
-        if(!projectService.isOwnerOfProject(userId,projectName)){
-            throw new APIException(userId+"is not the owner of project",HttpStatus.BAD_REQUEST);
-        }
-        projectService.deleteProjectById(projectName);
-
-        res = new ResponseEntity<Void>(HttpStatus.OK);
-
-        return res;
+    @Override
+    public ResponseEntity<Void> userIdProjectsProjectIdDelete(String userId, String projectId) throws Exception {
+        return null;
     }
 
-    public ResponseEntity<Project> userIdProjectsProjectNameGet(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
-,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName) throws Exception{
+    @Override
+    public ResponseEntity<Project> userIdProjectsProjectIdGet(String userId, String projectId) throws Exception {
         ResponseEntity<Project> res = null;
-        this.checkResource(userId,projectName);
+        this.checkResource(userId,projectId);
 
-        Boolean existsUserInProject = projectService.existsUserInProject(userId,projectName);
+        Boolean existsUserInProject = projectService.existsUserInProject(userId,projectId);
 
         if(!existsUserInProject){
             throw new APIException("Does Not Exists User In Project",HttpStatus.BAD_REQUEST);
         }
 
-        Project project = projectService.getProjectByProjectName(projectName);
+        Project project = projectService.getProjectById(projectId);
         res = new ResponseEntity<Project>(project,HttpStatus.OK);
         return res;
     }
 
-    public ResponseEntity<List<Group>> userIdProjectsProjectNameGroupsGet(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
-,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
-) throws Exception{
+    @Override
+    public ResponseEntity<List<Group>> userIdProjectsProjectIdGroupsGet(String userId, String projectId) throws Exception {
         ResponseEntity<List<Group>> res = null;
 
-        this.checkResource(userId,projectName);
+        this.checkResource(userId,projectId);
 
-        List<Group> groups = projectService.getGroupsByProjectName(projectName);
+        List<Group> groups = projectService.getGroupsByProjectId(projectId);
 
         res = new ResponseEntity<List<Group>>(groups,HttpStatus.OK);
         return res;
     }
 
-    public ResponseEntity<List<Member>> userIdProjectsProjectNameGroupsGroupNameMembersGet(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
-,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
-,@ApiParam(value = "group_name",required=true) @PathVariable("group_name") String groupName
-) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<List<Member>>(objectMapper.readValue("[ {\n  \"name\" : \"name\",\n  \"id\" : \"id\",\n  \"email\" : \"email\"\n}, {\n  \"name\" : \"name\",\n  \"id\" : \"id\",\n  \"email\" : \"email\"\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<Member>>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<List<Member>>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
-    public ResponseEntity<Void> userIdProjectsProjectNameGroupsGroupNameMembersPatch(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
-,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
-,@ApiParam(value = "group_name",required=true) @PathVariable("group_name") String groupName
-,@NotNull @ApiParam(value = "member id", required = true) @Valid @RequestParam(value = "member_id", required = true) String memberId
-) {
-        String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
-    public ResponseEntity<Void> userIdProjectsProjectNameGroupsGroupNameInvitationPut(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
-,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
-,@ApiParam(value = "group_name",required=true) @PathVariable("group_name") String groupName
-,@NotNull @ApiParam(value = "email", required = true) @Valid @RequestParam(value = "email", required = true) String email
-) throws APIException, KeyCloakAdminException {
+    @Override
+    public ResponseEntity<Void> userIdProjectsProjectIdGroupsGroupIdInvitationPut(String userId, String projectId, String groupId, @NotNull @Valid String email) throws Exception {
         ResponseEntity<Void> res = null;
 
-        this.checkResource(userId,projectName);
-        projectService.inviteUserToGroup(email,projectName,groupName);
+        this.checkResource(userId,projectId);
+        projectService.inviteUserToGroup(email,projectId,groupId);
 
         return res;
     }
 
-    public ResponseEntity<Void> userIdProjectsProjectNameMembersMemberIdDelete(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
-,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
-,@ApiParam(value = "user id == member_id",required=true) @PathVariable("member_id") String memberId
-) {
-        String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+    @Override
+    public ResponseEntity<List<Member>> userIdProjectsProjectIdGroupsGroupIdMembersGet(String userId, String projectId, String groupId) throws Exception {
+        ResponseEntity<List<Member>> res = null;
+        this.checkResource(userId,projectId);
+        List<Member> members = projectService.getSubGroupMember(projectId,groupId);
+        res = new ResponseEntity<List<Member>>(members,HttpStatus.OK);
+        return res;
     }
 
-    public ResponseEntity<Void> userIdProjectsProjectNamePatch(@ApiParam(value = "" ,required=true )  @Valid @RequestBody UpdateProject body
-,@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
-,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
-) throws Exception{
+    @Override
+    public ResponseEntity<Void> userIdProjectsProjectIdGroupsGroupIdMembersPatch(String userId, String projectId, String groupId, @NotNull @Valid String memberId) throws Exception {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<Void> userIdProjectsProjectIdMembersMemberIdDelete(String userId, String projectId, String memberId) throws Exception {
+        ResponseEntity<Void> res = null;
+
+        this.checkResource(userId,projectId);
+
+        if(!projectService.isOwnerOfProject(userId,projectId)){
+            throw new APIException(userId+"is not the owner of project",HttpStatus.BAD_REQUEST);
+        }
+        projectService.deleteProjectById(projectId);
+
+        res = new ResponseEntity<Void>(HttpStatus.OK);
+
+        return res;
+    }
+
+    @Override
+    public ResponseEntity<Void> userIdProjectsProjectIdPatch(@Valid UpdateProject body, String userId, String projectId) throws Exception {
         ResponseEntity<Void> res = null;
         Map<String,String> attrs = null;
         String owner = body.getOwner();
         String description = body.getDescription();
 
-        if(!projectService.isOwnerOfProject(userId,projectName)){
+        if(!projectService.isOwnerOfProject(userId,projectId)){
             throw new APIException(userId+"is not the owner of project",HttpStatus.BAD_REQUEST);
         }
 
@@ -194,16 +176,10 @@ public class ProjectsApiController implements ProjectsApi {
             }
         }
 
-        projectService.updateProjectInfo(projectName,attrs);
+        projectService.updateProjectInfo(projectId,attrs);
 
         res = new ResponseEntity<Void>(HttpStatus.OK);
 
         return res;
     }
-
-    private void checkResource(String userId,String projectName) throws APIException {
-        projectService.checkUserById(userId);
-        projectService.checkProjectByProjectName(projectName);
-    }
-
 }

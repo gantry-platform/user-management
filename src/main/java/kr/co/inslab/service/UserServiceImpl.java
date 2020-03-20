@@ -31,12 +31,13 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
 
 
     @Override
-    public Project createProject(String userId, String displayName, String description) throws KeyCloakAdminException{
+    public Project createProject(String userId, String displayName, String description) throws KeyCloakAdminException, APIException {
         String projectName = userId+"_"+displayName;
         String adminGroupName = SubGroup.ADMIN.toString();
         String opsGroupName = SubGroup.OPS.toString();
         String devGroupName = SubGroup.DEV.toString();
 
+        GroupRepresentation projectGroupRep = null;
         Map<String,String> groupAttr = new HashMap<String,String>();
 
         groupAttr.put(KeyCloakStaticConfig.DISPLAY_NAME,displayName);
@@ -46,20 +47,31 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
         if(!description.isEmpty()){
             groupAttr.put(KeyCloakStaticConfig.DESCRIPTION,description);
         }
+        try{
+            projectGroupRep = this.createGroup(projectName,groupAttr);
+            GroupRepresentation adminGroupRep = this.addSubGroup(projectGroupRep, adminGroupName);
+            GroupRepresentation opsGroupRep = this.addSubGroup(projectGroupRep, opsGroupName);
+            GroupRepresentation devGroupRep = this.addSubGroup(projectGroupRep, devGroupName);
+            this.addRoleToGroup(adminGroupRep, Role.ADMIN);
+            this.addRoleToGroup(opsGroupRep, Role.OPS);
+            this.addRoleToGroup(devGroupRep, Role.DEV);
+            this.joinGroup(projectGroupRep,userId);
+            this.joinGroup(adminGroupRep,userId);
+        } catch (Exception e){
+            if(projectGroupRep != null){
+                this.removeGroupById(projectGroupRep.getId());
+                throw new APIException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            if (e instanceof KeyCloakAdminException){
+                throw e;
+            }
+        }
 
-        GroupRepresentation projectGroupRep = this.createGroup(projectName,groupAttr);
-        GroupRepresentation adminGroupRep = this.addSubGroup(projectGroupRep, adminGroupName);
-        GroupRepresentation opsGroupRep = this.addSubGroup(projectGroupRep, opsGroupName);
-        GroupRepresentation devGroupRep = this.addSubGroup(projectGroupRep, devGroupName);
-        this.addRoleToGroup(adminGroupRep, Role.ADMIN);
-        this.addRoleToGroup(opsGroupRep, Role.OPS);
-        this.addRoleToGroup(devGroupRep, Role.DEV);
-        this.joinGroup(projectGroupRep,userId);
-        this.joinGroup(adminGroupRep,userId);
 
         Project project = new Project();
         project.setDisplayName(displayName);
         project.setName(projectName);
+        project.setId(projectGroupRep.getId());
 
         return project;
     }
@@ -80,36 +92,40 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
 
 
     @Override
-    public User getUserInfoById(String userId,Boolean projectInfo){
+    public User getUserInfoById(String userId,Boolean includeProject){
         UserResource userResource = this.getUserResourceById(userId);
         UserRepresentation gantryUser = userResource.toRepresentation();
         List<GroupRepresentation> gantryProjects = this.getGroupsByUserId(userId);
 
-        User user = new User();
-        user.setUserName(gantryUser.getUsername());
-        user.setFirstName(gantryUser.getFirstName());
-        user.setLastName(gantryUser.getLastName());
-        user.setEmailVerified(gantryUser.isEmailVerified());
-        user.setEmail(gantryUser.getEmail());
-        user.setUserId(userId);
+        User user = this.newUSer(gantryUser);
 
         if (gantryProjects != null && gantryProjects.size() > 0){
             List<Project> projects = new ArrayList<Project>();
             for(GroupRepresentation gantryProject: gantryProjects){
                 GroupRepresentation groupRepresentation = this.getGroupByGroupId(gantryProject.getId());
                 Project project = null;
-                if(projectInfo){
+                if(includeProject){
                     project = this.makeProjectInfo(groupRepresentation);
                 }else{
                     project = this.makeProjectMetaInfo(groupRepresentation);
                 }
-
                 if(project != null){
                     projects.add(project);
                 }
             }
             user.setProjects(projects);
         }
+        return user;
+    }
+
+    private User newUSer(UserRepresentation userRepresentation){
+        User user = new User();
+        user.setUserName(userRepresentation.getUsername());
+        user.setFirstName(userRepresentation.getFirstName());
+        user.setLastName(userRepresentation.getLastName());
+        user.setEmailVerified(userRepresentation.isEmailVerified());
+        user.setEmail(userRepresentation.getEmail());
+        user.setUserId(userRepresentation.getId());
         return user;
     }
 

@@ -6,6 +6,7 @@ import kr.co.inslab.exception.KeyCloakAdminException;
 import kr.co.inslab.keycloak.AbstractKeyCloak;
 import kr.co.inslab.keycloak.KeyCloakAdmin;
 import kr.co.inslab.model.Group;
+import kr.co.inslab.model.Member;
 import kr.co.inslab.model.Project;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.GroupRepresentation;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.WebApplicationException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,12 +32,12 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
 
     @Override
-    public Boolean existsUserInProject(String userId, String projectName){
+    public Boolean existsUserInProject(String userId, String projectId){
         Boolean existsUserInProject = false;
         List<GroupRepresentation> groupRepresentations = this.getGroupsByUserId(userId);
 
         for(GroupRepresentation groupRepresentation : groupRepresentations){
-            if(groupRepresentation.getName().equals(projectName)){
+            if(groupRepresentation.getId().equals(projectId)){
                 existsUserInProject = true;
                 break;
             }
@@ -59,16 +61,15 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
 
     @Override
-    public Project getProjectByProjectName(String projectName) throws APIException{
+    public Project getProjectById(String projectId) throws APIException{
         GroupRepresentation groupRepresentation = null;
-        String groupPath = this.projectNameToGroupPath(projectName);;
         try{
-            groupRepresentation = this.getGroupByGroupPath(groupPath);
+            groupRepresentation = this.getGroupByGroupId(projectId);
         }catch (Exception e){
             if(e instanceof javax.ws.rs.WebApplicationException) {
                 String message = ((WebApplicationException)e).getResponse().getStatusInfo().getReasonPhrase();
                 int code = ((WebApplicationException)e).getResponse().getStatusInfo().getStatusCode();
-                throw new APIException("[project_name : "+projectName+"] "+message, HttpStatus.resolve(code));
+                throw new APIException("[project_id : "+projectId+"] "+message, HttpStatus.resolve(code));
             }
             throw e;
         }
@@ -78,9 +79,9 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
     }
 
     @Override
-    public void updateProjectInfo(String projectName, Map<String,String> attrs) {
-        String groupPath = this.projectNameToGroupPath(projectName);
-        GroupRepresentation groupRepresentation = this.getGroupByGroupPath(groupPath);
+    public void updateProjectInfo(String projectId, Map<String,String> attrs) {
+
+        GroupRepresentation groupRepresentation = this.getGroupByGroupId(projectId);
 
         if(attrs != null){
             for(String key:attrs.keySet()){
@@ -93,10 +94,9 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
     }
 
     @Override
-    public Boolean isOwnerOfProject(String userId,String projectName) {
+    public Boolean isOwnerOfProject(String userId,String projectId) {
         Boolean isOwner = false;
-        String groupPath = this.projectNameToGroupPath(projectName);
-        GroupRepresentation groupRepresentation = this.getGroupByGroupPath(groupPath);
+        GroupRepresentation groupRepresentation = this.getGroupByGroupId(projectId);
         Project project = this.makeProjectInfo(groupRepresentation);
         if (project.getOwner().equals(userId)){
             isOwner = true;
@@ -105,32 +105,28 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
     }
 
     @Override
-    public void deleteProjectById(String projectName) {
-        String groupPath = this.projectNameToGroupPath(projectName);
-        GroupRepresentation groupRepresentation = this.getGroupByGroupPath(groupPath);
-        this.removeGroupById(groupRepresentation.getId());
+    public void deleteProjectById(String projectId) {
+        this.removeGroupById(projectId);
     }
 
     @Override
-    public List<Group> getGroupsByProjectName(String projectName) throws APIException{
+    public List<Group> getGroupsByProjectId(String projectId) throws APIException{
         List<Group> groups = null;
-        Project project = this.getProjectByProjectName(projectName);
+        Project project = this.getProjectById(projectId);
         groups = project.getGroups();
         return groups;
     }
 
     @Override
-    public void inviteUserToGroup(String email,String projectName,String groupName) throws KeyCloakAdminException{
+    public void inviteUserToGroup(String email,String projectId,String groupId) throws KeyCloakAdminException{
 
         List<UserRepresentation> userRepresentations = this.getUserByEmail(email);
 
         //New User
         if(userRepresentations == null || userRepresentations.size() == 0){
-            String groupPath = projectNameToGroupPath(projectName);
-            String subGroupPath = groupPath+"/"+groupName;
-            logger.debug("subGroupPath:"+subGroupPath);
-            GroupRepresentation topGroup = this.getGroupByGroupPath(groupPath);
-            GroupRepresentation subGroup = this.getGroupByGroupPath(subGroupPath);
+
+            GroupRepresentation topGroup = this.getGroupByGroupId(projectId);
+            GroupRepresentation subGroup = this.getGroupByGroupId(groupId);
             UserRepresentation userRepresentation = this.createUser(email);
             UserResource userResource = this.getUserResourceById(userRepresentation.getId());
             this.joinGroup(topGroup,userRepresentation.getId());
@@ -143,9 +139,26 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
     }
 
     @Override
-    public void checkProjectByProjectName(String projectName) {
-        String groupPath = this.projectNameToGroupPath(projectName);
-        this.getGroupByGroupPath(groupPath);
+    public void checkProjectByProjectId(String projectId) {
+        this.getGroupByGroupId(projectId);
+    }
+
+    @Override
+    public List<Member> getSubGroupMember(String projectId,String groupId) {
+        List<Member> members = new ArrayList<Member>();
+
+        GroupRepresentation groupRepresentation = this.getGroupByGroupId(groupId);
+        List<UserRepresentation> userRepresentations = this.getMembersByGroupId(groupRepresentation.getId());
+
+        for(UserRepresentation user : userRepresentations){
+            Member member = new Member();
+            member.setUserName(user.getUsername());
+            member.setEmailVerified(user.isEmailVerified());
+            member.setUserId(user.getId());
+            member.setEmail(user.getEmail());
+            members.add(member);
+        }
+        return members;
     }
 
 

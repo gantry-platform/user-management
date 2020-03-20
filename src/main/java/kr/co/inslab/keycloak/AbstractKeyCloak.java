@@ -59,8 +59,8 @@ public abstract class AbstractKeyCloak {
         }
 
         Response response = this.getRealm().groups().add(groupRepresentation);
-        String createdId = getCreatedId(response);
-        logger.debug(createdId);
+        String createdId = getCreatedId(response,groupName);
+
 
         groupRepresentation.setId(createdId);
         return groupRepresentation;
@@ -72,7 +72,7 @@ public abstract class AbstractKeyCloak {
         groupRepresentation.setName(subGroupName);
 
         Response response = this.getRealm().groups().group(topGroup.getId()).subGroup(groupRepresentation);
-        String createdId = getCreatedId(response);
+        String createdId = getCreatedId(response,subGroupName);
 
         groupRepresentation.setId(createdId);
         return groupRepresentation;
@@ -128,7 +128,7 @@ public abstract class AbstractKeyCloak {
         userRepresentation.setRequiredActions(actions);
 
         Response response = this.getRealm().users().create(userRepresentation);
-        String createdId = getCreatedId(response);
+        String createdId = getCreatedId(response,email);
         userRepresentation.setId(createdId);
 
         return userRepresentation;
@@ -139,13 +139,13 @@ public abstract class AbstractKeyCloak {
     }
 
 
-    protected String getCreatedId(Response response) throws KeyCloakAdminException {
+    protected String getCreatedId(Response response,String resourceName) throws KeyCloakAdminException {
         URI location = response.getLocation();
         if (!response.getStatusInfo().equals(Response.Status.CREATED)) {
             Response.StatusType statusInfo = response.getStatusInfo();
             response.bufferEntity();
             String body = response.readEntity(String.class);
-            throw new KeyCloakAdminException(statusInfo.getReasonPhrase(),HttpStatus.resolve(statusInfo.getStatusCode()));
+            throw new KeyCloakAdminException("[resourceId : "+resourceName+"]"+statusInfo.getReasonPhrase(),HttpStatus.resolve(statusInfo.getStatusCode()));
         }
         if (location == null) {
             return null;
@@ -160,6 +160,7 @@ public abstract class AbstractKeyCloak {
         List<GroupRepresentation> subGroups = groupRepresentation.getSubGroups();
         if (subGroups != null && subGroups.size() > 0) {
             project = new Project();
+            project.setId(groupRepresentation.getId());
             project.setName(groupRepresentation.getName());
             this.setAdditionalProperties(groupRepresentation,project,pendingUsers);
             project.setGroups(this.addSubGroupsInfo(subGroups));
@@ -172,6 +173,7 @@ public abstract class AbstractKeyCloak {
         List<GroupRepresentation> subGroups = groupRepresentation.getSubGroups();
         if (subGroups != null && subGroups.size() > 0) {
             project = new Project();
+            project.setId(groupRepresentation.getId());
             project.setName(groupRepresentation.getName());
             Map<String, List<String>> groupAttrs = groupRepresentation.getAttributes();
 
@@ -191,6 +193,7 @@ public abstract class AbstractKeyCloak {
         List<Group> groups = new ArrayList<Group>();
         for (GroupRepresentation gantryGroup : subGroups) {
             Group group = new Group();
+            group.setId(gantryGroup.getId());
             group.setName(gantryGroup.getName());
             group.setMembers(this.getMembers(gantryGroup.getId()));
             groups.add(group);

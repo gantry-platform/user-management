@@ -16,8 +16,11 @@ import javax.validation.constraints.*;
  * Group
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-03-16T09:54:20.497+09:00[Asia/Seoul]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-03-20T16:37:02.439+09:00[Asia/Seoul]")
 public class Group   {
+  @JsonProperty("id")
+  private String id = null;
+
   @JsonProperty("name")
   private String name = null;
 
@@ -27,6 +30,25 @@ public class Group   {
   @JsonProperty("members")
   @Valid
   private List<Member> members = null;
+
+  public Group id(String id) {
+    this.id = id;
+    return this;
+  }
+
+  /**
+   * Get id
+   * @return id
+  **/
+  @ApiModelProperty(value = "")
+  
+    public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
 
   public Group name(String name) {
     this.name = name;
@@ -103,14 +125,15 @@ public class Group   {
       return false;
     }
     Group group = (Group) o;
-    return Objects.equals(this.name, group.name) &&
+    return Objects.equals(this.id, group.id) &&
+        Objects.equals(this.name, group.name) &&
         Objects.equals(this.displayName, group.displayName) &&
         Objects.equals(this.members, group.members);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, displayName, members);
+    return Objects.hash(id, name, displayName, members);
   }
 
   @Override
@@ -118,6 +141,7 @@ public class Group   {
     StringBuilder sb = new StringBuilder();
     sb.append("class Group {\n");
     
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
     sb.append("    members: ").append(toIndentedString(members)).append("\n");
