@@ -409,56 +409,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-    patch:
-      summary: 맴버의 그룹정보를 변경한다.(e.g.) admin to ops)
-      tags:
-        - projects
-      parameters:
-        - name: user_id
-          in: path
-          required: true
-          description: user id (not name or email)
-          schema:
-            type: string
-        - name: project_name
-          in: path
-          required: true
-          description: project name
-          schema:
-            type: string
-        - name: group_name
-          in: path
-          required: true
-          description: group_name
-          schema:
-            type: string
-        - name: member_id
-          in: query
-          required: true
-          description: member id
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+
   /{user_id}/projects/{project_name}/members/{member_id}:
     delete:
       summary: 특정 맴버를 프로젝트에서 삭제한다.(그룹이 아니라 프로젝트임)
@@ -555,7 +506,56 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-
+    patch:
+      summary: 맴버의 그룹정보를 변경한다.(e.g.) admin to ops)
+      tags:
+        - projects
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: user id (not name or email)
+          schema:
+            type: string
+        - name: project_name
+          in: path
+          required: true
+          description: project name
+          schema:
+            type: string
+        - name: group_name
+          in: path
+          required: true
+          description: group_name
+          schema:
+            type: string
+        - name: member_id
+          in: query
+          required: true
+          description: member id
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
 components:
   schemas:

@@ -141,7 +141,7 @@ public class ProjectsApiController implements ProjectsApi {
         return new ResponseEntity<List<Member>>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<Void> userIdProjectsProjectNameGroupsGroupNamePatch(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
+    public ResponseEntity<Void> userIdProjectsProjectNameGroupsGroupNameMembersPatch(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
 ,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
 ,@ApiParam(value = "group_name",required=true) @PathVariable("group_name") String groupName
 ,@NotNull @ApiParam(value = "member id", required = true) @Valid @RequestParam(value = "member_id", required = true) String memberId

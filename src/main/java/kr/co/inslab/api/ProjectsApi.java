@@ -118,16 +118,16 @@ public interface ProjectsApi {
 );
 
 
-    @ApiOperation(value = "맴버의 그룹정보를 변경한다.(e.g.) admin to ops)", nickname = "userIdProjectsProjectNameGroupsGroupNamePatch", notes = "", tags={ "projects", })
+    @ApiOperation(value = "맴버의 그룹정보를 변경한다.(e.g.) admin to ops)", nickname = "userIdProjectsProjectNameGroupsGroupNameMembersPatch", notes = "", tags={ "projects", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Success"),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class) })
-    @RequestMapping(value = "/{user_id}/projects/{project_name}/groups/{group_name}",
+    @RequestMapping(value = "/{user_id}/projects/{project_name}/groups/{group_name}/members",
         produces = { "application/json" }, 
         method = RequestMethod.PATCH)
-    ResponseEntity<Void> userIdProjectsProjectNameGroupsGroupNamePatch(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
+    ResponseEntity<Void> userIdProjectsProjectNameGroupsGroupNameMembersPatch(@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
 ,@ApiParam(value = "project name",required=true) @PathVariable("project_name") String projectName
 ,@ApiParam(value = "group_name",required=true) @PathVariable("group_name") String groupName
 ,@NotNull @ApiParam(value = "member id", required = true) @Valid @RequestParam(value = "member_id", required = true) String memberId
