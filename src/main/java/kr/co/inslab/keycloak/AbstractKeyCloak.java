@@ -78,8 +78,8 @@ public abstract class AbstractKeyCloak {
         return groupRepresentation;
     }
 
-    protected void joinGroup(GroupRepresentation joinGroup,String userId) {
-        this.getRealm().users().get(userId).joinGroup(joinGroup.getId());
+    protected void joinGroup(String userId,String groupId) {
+        this.getRealm().users().get(userId).joinGroup(groupId);
     }
 
     protected void addRoleToGroup(GroupRepresentation targetGroup,Role role) {
@@ -90,8 +90,11 @@ public abstract class AbstractKeyCloak {
         this.getRealm().groups().group(targetGroup.getId()).roles().realmLevel().add(roleRepresentations);
     }
 
+    protected void leaveGroup(String userId,String groupId) {
+        this.getRealm().users().get(userId).leaveGroup(groupId);
+    }
 
-    protected GroupRepresentation getGroupByGroupId(String groupId) {
+    protected GroupRepresentation getGroupById(String groupId) {
         GroupRepresentation groupRepresentation = this.getRealm().groups().group(groupId).toRepresentation();
         return groupRepresentation;
     }
@@ -112,6 +115,8 @@ public abstract class AbstractKeyCloak {
     protected RealmResource getRealm(){
         return this.keyCloakAdmin.getInstance().realm(this.keyCloakAdmin.getTargetRealm());
     }
+
+    //TODO: 아래의 메소드 중 용도에 맞지 않는 메소드 이동
 
     protected UserRepresentation createUser(String email) throws KeyCloakAdminException {
         String [] splitEmail = email.split("@");

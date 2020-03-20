@@ -20,4 +20,5 @@ public interface ProjectService {
     public void inviteUserToGroup(String email,String projectId,String groupId) throws KeyCloakAdminException;
     public void checkProjectByProjectId(String projectId);
     public List<Member> getSubGroupMember(String projectId,String groupId);
+    public void moveGroupOfMember(String projectId,String groupId,String memberId);
 }

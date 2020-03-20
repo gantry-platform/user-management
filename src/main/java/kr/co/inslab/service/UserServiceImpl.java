@@ -55,8 +55,8 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
             this.addRoleToGroup(adminGroupRep, Role.ADMIN);
             this.addRoleToGroup(opsGroupRep, Role.OPS);
             this.addRoleToGroup(devGroupRep, Role.DEV);
-            this.joinGroup(projectGroupRep,userId);
-            this.joinGroup(adminGroupRep,userId);
+            this.joinGroup(userId,projectGroupRep.getId());
+            this.joinGroup(userId,adminGroupRep.getId());
         } catch (Exception e){
             if(projectGroupRep != null){
                 this.removeGroupById(projectGroupRep.getId());
@@ -102,7 +102,7 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
         if (gantryProjects != null && gantryProjects.size() > 0){
             List<Project> projects = new ArrayList<Project>();
             for(GroupRepresentation gantryProject: gantryProjects){
-                GroupRepresentation groupRepresentation = this.getGroupByGroupId(gantryProject.getId());
+                GroupRepresentation groupRepresentation = this.getGroupById(gantryProject.getId());
                 Project project = null;
                 if(includeProject){
                     project = this.makeProjectInfo(groupRepresentation);
