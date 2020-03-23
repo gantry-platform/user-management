@@ -126,7 +126,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
         //New User
         if(userRepresentations == null || userRepresentations.size() == 0){
-
+            //TODO: 생성 error 처리 추가해야 함
             GroupRepresentation topGroup = this.getGroupById(projectId);
             GroupRepresentation subGroup = this.getGroupById(groupId);
             UserRepresentation userRepresentation = this.createUser(email);

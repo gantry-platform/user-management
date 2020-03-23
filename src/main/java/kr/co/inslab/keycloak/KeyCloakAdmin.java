@@ -5,9 +5,11 @@ import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
-@Component
+@Configuration
 public class KeyCloakAdmin {
     @Value("${keycloak.serverUrl}")
     private String SERVER_URL;
@@ -24,9 +26,7 @@ public class KeyCloakAdmin {
     @Value("${keycloak.clientSecret}")
     private String CLIENT_SECRET;
 
-
-
-
+    @Bean
     public Keycloak getInstance(){
         Keycloak keycloak= KeycloakBuilder.builder()
                 .serverUrl(SERVER_URL)
@@ -41,6 +41,9 @@ public class KeyCloakAdmin {
 
     public String getTargetRealm(){
         return TARGET_REALM;
+    }
+    public String getClientId(){
+        return CLIENT_ID;
     }
 }
 

@@ -92,6 +92,7 @@ public abstract class AbstractKeyCloak {
 
     protected void leaveGroup(String userId,String groupId) {
         this.getRealm().users().get(userId).leaveGroup(groupId);
+
     }
 
     protected GroupRepresentation getGroupById(String groupId) {
@@ -102,6 +103,13 @@ public abstract class AbstractKeyCloak {
         GroupRepresentation groupRepresentation = this.getRealm().getGroupByPath(groupPath);
         return groupRepresentation;
     }
+
+    protected void sendEmail(String userId){
+        List<String> action = new ArrayList<>();
+        action.add("group");
+        this.getRealm().users().get(userId).executeActionsEmail("dashboard","https://dashboard.gantry.ai",action);
+    }
+
 
     protected List<GroupRepresentation> getGroupsByUserId(String userId) {
         List<GroupRepresentation> groupRepresentations = this.getRealm().users().get(userId).groups();
@@ -125,8 +133,6 @@ public abstract class AbstractKeyCloak {
         URI location = response.getLocation();
         if (!response.getStatusInfo().equals(Response.Status.CREATED)) {
             Response.StatusType statusInfo = response.getStatusInfo();
-            response.bufferEntity();
-            String body = response.readEntity(String.class);
             throw new KeyCloakAdminException("[resourceId : "+resourceName+"]"+statusInfo.getReasonPhrase(),HttpStatus.resolve(statusInfo.getStatusCode()));
         }
         if (location == null) {
@@ -150,6 +156,7 @@ public abstract class AbstractKeyCloak {
         }
         return project;
     }
+
 
     protected Project makeProjectMetaInfo(GroupRepresentation groupRepresentation) {
         Project project = null;
@@ -188,7 +195,7 @@ public abstract class AbstractKeyCloak {
         List<Member> members = null;
         List<UserRepresentation> gantryMembers = this.getMembersByGroupId(groupId);
         if (gantryMembers.size() > 0) {
-            members = new ArrayList<Member>();
+            members = new ArrayList<>();
             for (UserRepresentation gantryMember : gantryMembers) {
                 Member member = new Member();
                 member.setUserId(gantryMember.getId());
@@ -206,7 +213,7 @@ public abstract class AbstractKeyCloak {
         List<PendingUser> pendingUsers = null;
         List<UserRepresentation> gantryMembers = this.getMembersByGroupId(groupId);
         if (gantryMembers.size() > 0) {
-            pendingUsers = new ArrayList<PendingUser>();
+            pendingUsers = new ArrayList<>();
             for (UserRepresentation gantryMember : gantryMembers) {
                 if(!gantryMember.isEmailVerified()){
                     PendingUser pendingUser = new PendingUser();
