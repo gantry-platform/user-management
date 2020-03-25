@@ -1,10 +1,14 @@
 package kr.co.inslab.service;
 
 
+import kr.co.inslab.bootstrap.KeyCloakAdminConfig;
+import kr.co.inslab.bootstrap.StaticConfig;
 import kr.co.inslab.exception.APIException;
 import kr.co.inslab.exception.KeyCloakAdminException;
 import kr.co.inslab.keycloak.*;
 import kr.co.inslab.model.Project;
+import kr.co.inslab.model.Role;
+import kr.co.inslab.model.SubGroup;
 import kr.co.inslab.model.User;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.GroupRepresentation;
@@ -25,7 +29,7 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
 
     private final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
-    public UserServiceImpl(KeyCloakAdmin keyCloakAdmin) {
+    public UserServiceImpl(KeyCloakAdminConfig keyCloakAdmin) {
         super(keyCloakAdmin);
     }
 
@@ -40,12 +44,12 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
         GroupRepresentation projectGroupRep = null;
         Map<String,String> groupAttr = new HashMap<String,String>();
 
-        groupAttr.put(KeyCloakStaticConfig.DISPLAY_NAME,displayName);
-        groupAttr.put(KeyCloakStaticConfig.OWNER,userId);
-        groupAttr.put(KeyCloakStaticConfig.STATUS,Project.StatusEnum.ACTIVE.toString());
+        groupAttr.put(StaticConfig.DISPLAY_NAME,displayName);
+        groupAttr.put(StaticConfig.OWNER,userId);
+        groupAttr.put(StaticConfig.STATUS,Project.StatusEnum.ACTIVE.toString());
 
         if(!description.isEmpty()){
-            groupAttr.put(KeyCloakStaticConfig.DESCRIPTION,description);
+            groupAttr.put(StaticConfig.DESCRIPTION,description);
         }
         try{
             projectGroupRep = this.createGroup(projectName,groupAttr);
@@ -66,7 +70,6 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
                 throw e;
             }
         }
-
 
         Project project = new Project();
         project.setDisplayName(displayName);
@@ -97,7 +100,7 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
         UserRepresentation gantryUser = userResource.toRepresentation();
         List<GroupRepresentation> gantryProjects = this.getGroupsByUserId(userId);
 
-        User user = this.newUSer(gantryUser);
+        User user = this.newUser(gantryUser);
 
         if (gantryProjects != null && gantryProjects.size() > 0){
             List<Project> projects = new ArrayList<Project>();
@@ -119,7 +122,7 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
     }
 
 
-    private User newUSer(UserRepresentation userRepresentation){
+    private User newUser(UserRepresentation userRepresentation){
         User user = new User();
         user.setUserName(userRepresentation.getUsername());
         user.setFirstName(userRepresentation.getFirstName());

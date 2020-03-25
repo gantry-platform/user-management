@@ -1,10 +1,9 @@
 package kr.co.inslab.keycloak;
 
+import kr.co.inslab.bootstrap.KeyCloakAdminConfig;
+import kr.co.inslab.bootstrap.StaticConfig;
 import kr.co.inslab.exception.KeyCloakAdminException;
-import kr.co.inslab.model.Group;
-import kr.co.inslab.model.Member;
-import kr.co.inslab.model.PendingUser;
-import kr.co.inslab.model.Project;
+import kr.co.inslab.model.*;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.RoleResource;
 import org.keycloak.admin.client.resource.UserResource;
@@ -25,11 +24,12 @@ import java.util.Map;
 @Component
 public abstract class AbstractKeyCloak {
 
-    private final KeyCloakAdmin keyCloakAdmin;
+    private final KeyCloakAdminConfig keyCloakAdminConfig;
+
     private static final Logger logger = LoggerFactory.getLogger(AbstractKeyCloak.class);
 
-    public AbstractKeyCloak(KeyCloakAdmin keyCloakAdmin) {
-        this.keyCloakAdmin = keyCloakAdmin;
+    public AbstractKeyCloak(KeyCloakAdminConfig keyCloakAdminConfig) {
+        this.keyCloakAdminConfig = keyCloakAdminConfig;
     }
 
 
@@ -82,7 +82,7 @@ public abstract class AbstractKeyCloak {
         this.getRealm().users().get(userId).joinGroup(groupId);
     }
 
-    protected void addRoleToGroup(GroupRepresentation targetGroup,Role role) {
+    protected void addRoleToGroup(GroupRepresentation targetGroup, Role role) {
         RoleResource roleResource = this.getRealm().roles().get(role.toString());
         RoleRepresentation roleRepresentation = roleResource.toRepresentation();
         List<RoleRepresentation> roleRepresentations = new ArrayList<RoleRepresentation>();
@@ -104,13 +104,6 @@ public abstract class AbstractKeyCloak {
         return groupRepresentation;
     }
 
-    protected void sendEmail(String userId){
-        List<String> action = new ArrayList<>();
-        action.add("group");
-        this.getRealm().users().get(userId).executeActionsEmail("dashboard","https://dashboard.gantry.ai",action);
-    }
-
-
     protected List<GroupRepresentation> getGroupsByUserId(String userId) {
         List<GroupRepresentation> groupRepresentations = this.getRealm().users().get(userId).groups();
         return groupRepresentations;
@@ -121,7 +114,7 @@ public abstract class AbstractKeyCloak {
     }
 
     protected RealmResource getRealm(){
-        return this.keyCloakAdmin.getInstance().realm(this.keyCloakAdmin.getTargetRealm());
+        return this.keyCloakAdminConfig.getInstance().realm(this.keyCloakAdminConfig.getTargetRealm());
     }
 
     protected void removeGroupById(String groupId){
@@ -144,7 +137,7 @@ public abstract class AbstractKeyCloak {
 
     protected Project makeProjectInfo(GroupRepresentation groupRepresentation) {
         Project project = null;
-        List<PendingUser> pendingUsers = this.addPendingUser(groupRepresentation.getId());
+        List<PendingUser> pendingUsers = this.makePendingUserFromEmailStatus(groupRepresentation.getId());
         List<GroupRepresentation> subGroups = groupRepresentation.getSubGroups();
         if (subGroups != null && subGroups.size() > 0) {
             project = new Project();
@@ -170,7 +163,7 @@ public abstract class AbstractKeyCloak {
             if (groupAttrs != null) {
                 for (String key : groupAttrs.keySet()) {
                     switch (key) {
-                        case KeyCloakStaticConfig.DISPLAY_NAME:
+                        case StaticConfig.DISPLAY_NAME:
                             project.setDisplayName(groupAttrs.get(key).get(0));
                     }
                 }
@@ -178,7 +171,7 @@ public abstract class AbstractKeyCloak {
         }
         return project;
     }
-    private List<Group> addSubGroupsInfo(List<GroupRepresentation> subGroups) {
+    private final List<Group> addSubGroupsInfo(List<GroupRepresentation> subGroups) {
 
         List<Group> groups = new ArrayList<Group>();
         for (GroupRepresentation gantryGroup : subGroups) {
@@ -191,7 +184,7 @@ public abstract class AbstractKeyCloak {
         return groups;
     }
 
-    private List<Member> getMembers(String groupId) {
+    private final List<Member> getMembers(String groupId) {
         List<Member> members = null;
         List<UserRepresentation> gantryMembers = this.getMembersByGroupId(groupId);
         if (gantryMembers.size() > 0) {
@@ -209,7 +202,7 @@ public abstract class AbstractKeyCloak {
     }
 
 
-    private List<PendingUser> addPendingUser(String groupId) {
+    private final List<PendingUser> makePendingUserFromEmailStatus(String groupId) {
         List<PendingUser> pendingUsers = null;
         List<UserRepresentation> gantryMembers = this.getMembersByGroupId(groupId);
         if (gantryMembers.size() > 0) {
@@ -225,27 +218,29 @@ public abstract class AbstractKeyCloak {
         return pendingUsers;
     }
 
-    private void setAdditionalProperties(GroupRepresentation groupRepresentation,Project project,List<PendingUser> pendingUsers){
+
+
+    private final void setAdditionalProperties(GroupRepresentation groupRepresentation,Project project,List<PendingUser> pendingUsers){
         Map<String, List<String>> groupAttrs = groupRepresentation.getAttributes();
 
         if (groupAttrs != null){
             for(String key : groupAttrs.keySet()){
                 switch (key){
-                    case KeyCloakStaticConfig.DESCRIPTION:
+                    case StaticConfig.DESCRIPTION:
                         project.setDescription(groupAttrs.get(key).get(0));
                         break;
-                    case KeyCloakStaticConfig.DISPLAY_NAME:
+                    case StaticConfig.DISPLAY_NAME:
                         project.setDisplayName(groupAttrs.get(key).get(0));
                         break;
-                    case KeyCloakStaticConfig.OWNER:
+                    case StaticConfig.OWNER:
                         project.setOwner(groupAttrs.get(key).get(0));
                         break;
-                    case KeyCloakStaticConfig.STATUS:
+                    case StaticConfig.STATUS:
                         project.setStatus(Project.StatusEnum.fromValue(groupAttrs.get(key).get(0)));
                         break;
-                    case KeyCloakStaticConfig.PENDING:
+                    case StaticConfig.PENDING:
                         if(pendingUsers == null){
-                            pendingUsers = new ArrayList<PendingUser>();
+                            pendingUsers = new ArrayList<>();
                         }
                         List<String> pendingEmails = groupAttrs.get(key);
                         for(String email:pendingEmails){

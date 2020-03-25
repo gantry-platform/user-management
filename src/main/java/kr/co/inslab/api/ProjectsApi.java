@@ -10,6 +10,7 @@ import kr.co.inslab.model.Error;
 import kr.co.inslab.model.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -165,5 +166,8 @@ public interface ProjectsApi {
 ,@ApiParam(value = "user id (not name or email)",required=true) @PathVariable("user_id") String userId
 ,@ApiParam(value = "project id",required=true) @PathVariable("project_id") String projectId
 )throws Exception;
+
+    @RequestMapping(value = "/projects/confirm-join",method = RequestMethod.GET)
+    public String confirmJoin(WebRequest request,@RequestParam("token") String token);
 
 }

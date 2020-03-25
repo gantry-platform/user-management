@@ -17,8 +17,9 @@ public interface ProjectService {
     public Boolean isOwnerOfProject(String userId,String projectId);
     public void deleteProjectById(String projectId);
     public List<Group> getGroupsByProjectId(String projectId) throws APIException;
-    public void inviteUserToGroup(String email,String projectId,String groupId) throws KeyCloakAdminException;
+    public void inviteUserToGroup(String email,String projectId,String groupId) throws KeyCloakAdminException,APIException;
     public void checkProjectByProjectId(String projectId);
     public List<Member> getSubGroupMember(String projectId,String groupId);
     public void moveGroupOfMember(String projectId,String groupId,String memberId);
+    public Boolean joinNewProjectAndGroupForExistsUser(String token);
 }

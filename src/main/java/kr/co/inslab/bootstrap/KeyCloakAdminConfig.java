@@ -1,4 +1,4 @@
-package kr.co.inslab.keycloak;
+package kr.co.inslab.bootstrap;
 
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.keycloak.OAuth2Constants;
@@ -7,10 +7,9 @@ import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 @Configuration
-public class KeyCloakAdmin {
+public class KeyCloakAdminConfig {
     @Value("${keycloak.serverUrl}")
     private String SERVER_URL;
 
@@ -42,8 +41,6 @@ public class KeyCloakAdmin {
     public String getTargetRealm(){
         return TARGET_REALM;
     }
-    public String getClientId(){
-        return CLIENT_ID;
-    }
+
 }
 

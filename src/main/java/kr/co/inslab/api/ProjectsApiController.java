@@ -2,7 +2,7 @@ package kr.co.inslab.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.inslab.exception.APIException;
-import kr.co.inslab.keycloak.KeyCloakStaticConfig;
+import kr.co.inslab.bootstrap.StaticConfig;
 import kr.co.inslab.model.Group;
 import kr.co.inslab.model.Member;
 import kr.co.inslab.model.Project;
@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.context.request.WebRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -52,7 +53,7 @@ public class ProjectsApiController implements ProjectsApi {
         this.checkResource(userId,projectId);
 
         Map<String,String> attrs = new HashMap<String, String>();
-        attrs.put(KeyCloakStaticConfig.STATUS,Project.StatusEnum.ACTIVE.toString());
+        attrs.put(StaticConfig.STATUS,Project.StatusEnum.ACTIVE.toString());
 
         projectService.updateProjectInfo(projectId,attrs);
 
@@ -67,7 +68,7 @@ public class ProjectsApiController implements ProjectsApi {
         ResponseEntity<Void> res = null;
         Map<String,String> attrs = new HashMap<String, String>();
 
-        attrs.put(KeyCloakStaticConfig.STATUS,Project.StatusEnum.ARCHIVE.toString());
+        attrs.put(StaticConfig.STATUS,Project.StatusEnum.ARCHIVE.toString());
 
         projectService.updateProjectInfo(projectId,attrs);
 
@@ -127,8 +128,8 @@ public class ProjectsApiController implements ProjectsApi {
 
         this.checkResource(userId,projectId);
         projectService.inviteUserToGroup(email,projectId,groupId);
-
         res = new ResponseEntity<Void>(HttpStatus.OK);
+
         return res;
     }
 
@@ -188,10 +189,10 @@ public class ProjectsApiController implements ProjectsApi {
         if(!owner.isEmpty() || !description.isEmpty()){
             attrs = new HashMap<String, String>();
             if(!owner.isEmpty()){
-                attrs.put(KeyCloakStaticConfig.OWNER,owner);
+                attrs.put(StaticConfig.OWNER,owner);
             }
             if(!description.isEmpty()){
-                attrs.put(KeyCloakStaticConfig.DESCRIPTION,description);
+                attrs.put(StaticConfig.DESCRIPTION,description);
             }
         }
 
@@ -200,5 +201,19 @@ public class ProjectsApiController implements ProjectsApi {
         res = new ResponseEntity<Void>(HttpStatus.OK);
 
         return res;
+    }
+
+    @Override
+    public String confirmJoin(WebRequest request,String token) {
+
+        Boolean success = projectService.joinNewProjectAndGroupForExistsUser(token);
+
+        //TODO: gantry url 변경
+
+        if(success == false){
+            return "redirect:http://127.0.0.1:80";
+        }
+
+        return "redirect:http://127.0.0.1:8080";
     }
 }

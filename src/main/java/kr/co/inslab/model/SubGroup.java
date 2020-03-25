@@ -1,4 +1,4 @@
-package kr.co.inslab.keycloak;
+package kr.co.inslab.model;
 
 public enum SubGroup {
     ADMIN("admin"),
