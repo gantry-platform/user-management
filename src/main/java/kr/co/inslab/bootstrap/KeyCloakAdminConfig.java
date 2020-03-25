@@ -26,7 +26,7 @@ public class KeyCloakAdminConfig {
     private String CLIENT_SECRET;
 
     @Bean
-    public Keycloak getInstance(){
+    public Keycloak keycloakAdmin(){
         Keycloak keycloak= KeycloakBuilder.builder()
                 .serverUrl(SERVER_URL)
                 .realm(MASTER_REALM)
@@ -37,10 +37,5 @@ public class KeyCloakAdminConfig {
                 .build();
         return keycloak;
     }
-
-    public String getTargetRealm(){
-        return TARGET_REALM;
-    }
-
 }
 

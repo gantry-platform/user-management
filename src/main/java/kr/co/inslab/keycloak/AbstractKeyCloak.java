@@ -1,9 +1,9 @@
 package kr.co.inslab.keycloak;
 
-import kr.co.inslab.bootstrap.KeyCloakAdminConfig;
 import kr.co.inslab.bootstrap.StaticConfig;
 import kr.co.inslab.exception.KeyCloakAdminException;
 import kr.co.inslab.model.*;
+import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.RoleResource;
 import org.keycloak.admin.client.resource.UserResource;
@@ -12,6 +12,7 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -24,12 +25,16 @@ import java.util.Map;
 @Component
 public abstract class AbstractKeyCloak {
 
-    private final KeyCloakAdminConfig keyCloakAdminConfig;
+    private final Keycloak keycloakAdmin;
+
+    @Value("${keycloak.targetRealm}")
+    private String targetRealm;
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractKeyCloak.class);
 
-    public AbstractKeyCloak(KeyCloakAdminConfig keyCloakAdminConfig) {
-        this.keyCloakAdminConfig = keyCloakAdminConfig;
+
+    public AbstractKeyCloak(Keycloak keycloakAdmin) {
+        this.keycloakAdmin = keycloakAdmin;
     }
 
 
@@ -114,7 +119,7 @@ public abstract class AbstractKeyCloak {
     }
 
     protected RealmResource getRealm(){
-        return this.keyCloakAdminConfig.getInstance().realm(this.keyCloakAdminConfig.getTargetRealm());
+        return this.keycloakAdmin.realm(this.targetRealm);
     }
 
     protected void removeGroupById(String groupId){

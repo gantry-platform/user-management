@@ -6,11 +6,11 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 @Component
-public class HtmlTemplate {
+public class HTMLTemplate {
 
     private final SpringTemplateEngine templateEngine;
 
-    public HtmlTemplate(SpringTemplateEngine templateEngine) {
+    public HTMLTemplate(SpringTemplateEngine templateEngine) {
         this.templateEngine = templateEngine;
     }
 

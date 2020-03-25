@@ -10,6 +10,7 @@ import kr.co.inslab.model.Project;
 import kr.co.inslab.model.Role;
 import kr.co.inslab.model.SubGroup;
 import kr.co.inslab.model.User;
+import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -29,8 +30,8 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
 
     private final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
-    public UserServiceImpl(KeyCloakAdminConfig keyCloakAdmin) {
-        super(keyCloakAdmin);
+    public UserServiceImpl(Keycloak keycloakAdmin) {
+        super(keycloakAdmin);
     }
 
 

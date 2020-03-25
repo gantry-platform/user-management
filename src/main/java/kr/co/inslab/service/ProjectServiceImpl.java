@@ -9,8 +9,9 @@ import kr.co.inslab.bootstrap.StaticConfig;
 import kr.co.inslab.model.Group;
 import kr.co.inslab.model.Member;
 import kr.co.inslab.model.Project;
-import kr.co.inslab.util.HtmlTemplate;
+import kr.co.inslab.util.HTMLTemplate;
 import kr.co.inslab.util.SimpleToken;
+import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -37,11 +38,11 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
     private final String NO_REPLY_GANTRY_AI = "noreply@gantry.ai";
 
-    private final HtmlTemplate htmlTemplate;
+    private final HTMLTemplate htmlTemplate;
 
 
-    public ProjectServiceImpl(KeyCloakAdminConfig keyCloakAdmin, RedisTemplate<String, Object> redisTemplate, MailSendingService mailSendingService, HtmlTemplate htmlTemplate) {
-        super(keyCloakAdmin);
+    public ProjectServiceImpl(Keycloak keycloakAdmin, RedisTemplate<String, Object> redisTemplate, MailSendingService mailSendingService, HTMLTemplate htmlTemplate) {
+        super(keycloakAdmin);
         this.redisTemplate = redisTemplate;
         this.mailSendingService = mailSendingService;
         this.htmlTemplate = htmlTemplate;
