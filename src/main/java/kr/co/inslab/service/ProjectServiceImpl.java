@@ -292,7 +292,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
         userRepresentation.setEmailVerified(false);
         userRepresentation.setEnabled(true);
         userRepresentation.setEmail(email);
-        userRepresentation.setUsername(splitEmail[1]);
+        userRepresentation.setUsername(splitEmail[0]);
 
         List<String> actions = new ArrayList<String>();
         actions.add(StaticConfig.UPDATE_PROFILE);
