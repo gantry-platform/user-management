@@ -5,46 +5,60 @@
  */
 package kr.co.inslab.api;
 
-import io.swagger.annotations.*;
+import kr.co.inslab.exception.APIException;
+import kr.co.inslab.exception.KeyCloakAdminException;
 import kr.co.inslab.model.Error;
 import kr.co.inslab.model.NewProject;
 import kr.co.inslab.model.Project;
 import kr.co.inslab.model.User;
+import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.CookieValue;
 
 import javax.validation.Valid;
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-03-16T09:54:20.497+09:00[Asia/Seoul]")
-@Api(value = "users", description = "the users API")
+import javax.validation.constraints.*;
+import java.util.List;
+import java.util.Map;
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-03-27T11:04:51.964+09:00[Asia/Seoul]")
+@Api(value = "Users", description = "the Users API")
 public interface UsersApi {
 
-
-    @ApiOperation(value = "유저 정보 조회", nickname = "usersUserIdGet", notes = "", response = User.class, tags={ "users", })
+    @ApiOperation(value = "유저 정보 조회", nickname = "usersGet", notes = "", response = User.class, tags={ "users", })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success", response = User.class),
             @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
             @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
             @ApiResponse(code = 404, message = "Not Found", response = Error.class) })
-    @RequestMapping(value = "/users/{user_id}",
+    @RequestMapping(value = "/users",
             produces = { "application/json" },
             method = RequestMethod.GET)
-    ResponseEntity<User> usersUserIdGet(@ApiParam(value = "user_id(not name)",required=true) @PathVariable("user_id") String userId
+    ResponseEntity<User> usersGet(@ApiParam(value = "user_id(not name)" ,required=true) @RequestHeader(value="X-User-Id", required=true) String xUserId
             ,@ApiParam(value = "프로젝트 정보까지 포함") @Valid @RequestParam(value = "include_project", required = false) Boolean includeProject
-    )throws Exception;
+    );
 
-    @ApiOperation(value = "신규 프로젝트 생성", nickname = "usersUserIdProjectsPost", notes = "", response = Project.class, tags={ "users", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 201, message = "Create", response = Project.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 409, message = "Conflict", response = Error.class) })
-    @RequestMapping(value = "/users/{user_id}/projects",
-        produces = { "application/json" }, 
-        consumes = { "application/json" },
-        method = RequestMethod.POST)
-    ResponseEntity<Project> usersUserIdProjectsPost(@ApiParam(value = "" ,required=true )  @Valid @RequestBody NewProject body
-,@ApiParam(value = "user_id(not name)",required=true) @PathVariable("user_id") String userId
-)throws  Exception;
+
+    @ApiOperation(value = "신규 프로젝트 생성", nickname = "usersProjectsPost", notes = "", response = Project.class, tags={ "users", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Create", response = Project.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 409, message = "Conflict", response = Error.class) })
+    @RequestMapping(value = "/users/projects",
+            produces = { "application/json" },
+            consumes = { "application/json" },
+            method = RequestMethod.POST)
+    ResponseEntity<Project> usersProjectsPost(@ApiParam(value = "" ,required=true )  @Valid @RequestBody NewProject body
+            ,@ApiParam(value = "user_id(not name)" ,required=true) @RequestHeader(value="X-User-Id", required=true) String xUserId
+    ) throws APIException, KeyCloakAdminException;
 
 }

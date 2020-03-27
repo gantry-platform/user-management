@@ -24,10 +24,9 @@ paths:
       tags:
         - users
       parameters:
-        - name: X-User-Id
+        - name: Authorization
           in: header
           required: true
-          description: user_id(not name)
           schema:
             type: string
         - name: include_project
@@ -67,10 +66,9 @@ paths:
       tags:
         - users
       parameters:
-        - name: X-User-Id
+        - name: Authorization
           in: header
           required: true
-          description: user_id(not name)
           schema:
             type: string
       requestBody:
@@ -116,10 +114,9 @@ paths:
       tags:
         - projects
       parameters:
-        - name: X-User-Id
+        - name: Authorization
           in: header
           required: true
-          description: user_id(not name)
           schema:
             type: string
         - name: project_id
@@ -158,10 +155,9 @@ paths:
       tags:
         - projects
       parameters:
-        - name: X-User-Id
+        - name: Authorization
           in: header
           required: true
-          description: user_id(not name)
           schema:
             type: string
         - name: project_id
@@ -202,10 +198,9 @@ paths:
       tags:
         - projects
       parameters:
-        - name: X-User-Id
+        - name: Authorization
           in: header
           required: true
-          description: user_id(not name)
           schema:
             type: string
         - name: project_id
@@ -241,10 +236,9 @@ paths:
       tags:
         - projects
       parameters:
-        - name: X-User-Id
+        - name: Authorization
           in: header
           required: true
-          description: user_id(not name)
           schema:
             type: string
         - name: project_id
@@ -280,10 +274,9 @@ paths:
       tags:
         - projects
       parameters:
-        - name: X-User-Id
+        - name: Authorization
           in: header
           required: true
-          description: user_id(not name)
           schema:
             type: string
         - name: project_id
@@ -319,10 +312,9 @@ paths:
       tags:
         - projects
       parameters:
-        - name: X-User-Id
+        - name: Authorization
           in: header
           required: true
-          description: user_id(not name)
           schema:
             type: string
         - name: project_id
@@ -364,10 +356,9 @@ paths:
       tags:
         - projects
       parameters:
-        - name: X-User-Id
+        - name: Authorization
           in: header
           required: true
-          description: user_id(not name)
           schema:
             type: string
         - name: project_id
@@ -422,10 +413,9 @@ paths:
       tags:
         - projects
       parameters:
-        - name: X-User-Id
+        - name: Authorization
           in: header
           required: true
-          description: user_id(not name)
           schema:
             type: string
         - name: project_id
@@ -467,10 +457,9 @@ paths:
       tags:
         - projects
       parameters:
-        - name: X-User-Id
+        - name: Authorization
           in: header
           required: true
-          description: user_id(not name)
           schema:
             type: string
         - name: project_id
@@ -517,10 +506,9 @@ paths:
       tags:
         - projects
       parameters:
-        - name: X-User-Id
+        - name: Authorization
           in: header
           required: true
-          description: user_id(not name)
           schema:
             type: string
         - name: project_id

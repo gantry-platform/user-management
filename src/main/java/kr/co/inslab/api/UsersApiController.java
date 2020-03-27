@@ -1,6 +1,8 @@
 package kr.co.inslab.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.inslab.exception.APIException;
+import kr.co.inslab.exception.KeyCloakAdminException;
 import kr.co.inslab.model.NewProject;
 import kr.co.inslab.model.Project;
 import kr.co.inslab.model.User;
@@ -33,32 +35,29 @@ public class UsersApiController implements UsersApi {
         this.userService = userService;
     }
 
+
     @Override
-    public ResponseEntity<User> usersUserIdGet(String userId,Boolean includeProject) throws Exception{
+    public ResponseEntity<User> usersGet(String xUserId, @Valid Boolean includeProject) {
         if(includeProject==null){
             includeProject=false;
         }
-        User user = userService.getUserInfoById(userId,includeProject);
+        User user = userService.getUserInfoById(xUserId,includeProject);
         ResponseEntity<User> res = new ResponseEntity<User>(user,HttpStatus.OK);
 
         return res;
     }
 
-
     @Override
-    public ResponseEntity<Project> usersUserIdProjectsPost(@Valid NewProject body, String userId) throws Exception {
-
-        userService.checkUserById(userId);
+    public ResponseEntity<Project> usersProjectsPost(@Valid NewProject body, String xUserId) throws APIException, KeyCloakAdminException {
+        userService.checkUserById(xUserId);
 
         String displayName = body.getDisplayName();
         String description = body.getDescription();
 
-        Project project = userService.createProject(userId,displayName,description);
+        Project project = userService.createProject(xUserId,displayName,description);
 
         ResponseEntity<Project> res = new ResponseEntity<Project>(project,HttpStatus.OK);
 
         return res;
     }
-
-
 }
