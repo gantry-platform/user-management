@@ -28,7 +28,7 @@ import java.util.Map;
 @Controller
 public class ProjectsApiController implements ProjectsApi {
 
-    private static final Logger log = LoggerFactory.getLogger(ProjectsApiController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProjectsApiController.class);
 
     private final ObjectMapper objectMapper;
 
@@ -268,7 +268,8 @@ public class ProjectsApiController implements ProjectsApi {
         if (token != null && !token.isEmpty()) {
             String[] splitToken = token.split(" ");
             AccessToken accessToken = TokenVerifier.create(splitToken[1], AccessToken.class).getToken();
-            userId = accessToken.getId();
+            userId = accessToken.getSubject();
+            logger.debug("subject:"+userId);
 
         }
         return userId;
