@@ -9,6 +9,7 @@ import kr.co.inslab.bootstrap.StaticConfig;
 import kr.co.inslab.model.Group;
 import kr.co.inslab.model.Member;
 import kr.co.inslab.model.Project;
+import kr.co.inslab.model.SubGroup;
 import kr.co.inslab.util.HTMLTemplate;
 import kr.co.inslab.util.SimpleToken;
 import org.keycloak.admin.client.Keycloak;
@@ -115,11 +116,32 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
     public Boolean isOwnerOfProject(String userId,String projectId) {
         Boolean isOwner = false;
         GroupRepresentation groupRepresentation = this.getGroupById(projectId);
-        Project project = this.makeProjectInfo(groupRepresentation);
+        Project project = this.makeProjectMetaInfo(groupRepresentation);
         if (project.getOwner().equals(userId)){
             isOwner = true;
         }
         return isOwner;
+    }
+
+    @Override
+    public Boolean isAdminOfProject(String userId, String projectId) {
+        Boolean isAdmin = false;
+        GroupRepresentation groupRepresentation = this.getGroupById(projectId);
+        List<GroupRepresentation> subGroups = groupRepresentation.getSubGroups();
+
+        for(GroupRepresentation subGroup : subGroups){
+            if(subGroup.getName().equals(SubGroup.ADMIN.toString())){
+                List<UserRepresentation> userRepresentations = this.getMembersByGroupId(subGroup.getId());
+                for(UserRepresentation userRepresentation : userRepresentations){
+                    if(userRepresentation.getId().equals(userId)){
+                        isAdmin = true;
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+        return isAdmin;
     }
 
     @Override

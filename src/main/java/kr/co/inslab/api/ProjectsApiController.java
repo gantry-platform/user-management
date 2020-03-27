@@ -196,8 +196,8 @@ public class ProjectsApiController implements ProjectsApi {
         ResponseEntity<Void> res = null;
         this.checkResource(userId,projectId);
 
-        if(!projectService.isOwnerOfProject(userId,projectId)){
-            throw new APIException(userId+"is not the owner of project",HttpStatus.BAD_REQUEST);
+        if(!projectService.isAdminOfProject(userId,projectId)){
+            throw new APIException(userId+"is not the admin of the project",HttpStatus.BAD_REQUEST);
         }
 
         projectService.moveGroupOfMember(projectId,groupId,memberId);
@@ -216,9 +216,10 @@ public class ProjectsApiController implements ProjectsApi {
 
         this.checkResource(userId,projectId);
 
-        if(!projectService.isOwnerOfProject(userId,projectId)){
-            throw new APIException(userId+"is not the owner of project",HttpStatus.BAD_REQUEST);
+        if(!projectService.isAdminOfProject(userId,projectId)){
+            throw new APIException(userId+"is not the admin of the project",HttpStatus.BAD_REQUEST);
         }
+
         projectService.deleteProjectById(projectId);
 
         res = new ResponseEntity<Void>(HttpStatus.OK);

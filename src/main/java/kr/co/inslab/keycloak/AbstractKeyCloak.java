@@ -170,6 +170,10 @@ public abstract class AbstractKeyCloak {
                     switch (key) {
                         case StaticConfig.DISPLAY_NAME:
                             project.setDisplayName(groupAttrs.get(key).get(0));
+                            break;
+                        case StaticConfig.OWNER:
+                            project.setOwner(groupAttrs.get(key).get(0));
+                            break;
                     }
                 }
             }
