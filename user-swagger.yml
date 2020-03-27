@@ -24,12 +24,6 @@ paths:
       tags:
         - users
       parameters:
-        - name: X-User-Id
-          in: header
-          required: true
-          description: user_id(not name)
-          schema:
-            type: string
         - name: include_project
           in: query
           required: false
@@ -66,13 +60,6 @@ paths:
       summary: 신규 프로젝트 생성
       tags:
         - users
-      parameters:
-        - name: X-User-Id
-          in: header
-          required: true
-          description: user_id(not name)
-          schema:
-            type: string
       requestBody:
         required: true
         content:
@@ -116,12 +103,6 @@ paths:
       tags:
         - projects
       parameters:
-        - name: X-User-Id
-          in: header
-          required: true
-          description: user_id(not name)
-          schema:
-            type: string
         - name: project_id
           in: path
           required: true
@@ -158,12 +139,6 @@ paths:
       tags:
         - projects
       parameters:
-        - name: X-User-Id
-          in: header
-          required: true
-          description: user_id(not name)
-          schema:
-            type: string
         - name: project_id
           in: path
           required: true
@@ -202,12 +177,6 @@ paths:
       tags:
         - projects
       parameters:
-        - name: X-User-Id
-          in: header
-          required: true
-          description: user_id(not name)
-          schema:
-            type: string
         - name: project_id
           in: path
           required: true
@@ -241,12 +210,6 @@ paths:
       tags:
         - projects
       parameters:
-        - name: X-User-Id
-          in: header
-          required: true
-          description: user_id(not name)
-          schema:
-            type: string
         - name: project_id
           in: path
           required: true
@@ -280,12 +243,6 @@ paths:
       tags:
         - projects
       parameters:
-        - name: X-User-Id
-          in: header
-          required: true
-          description: user_id(not name)
-          schema:
-            type: string
         - name: project_id
           in: path
           required: true
@@ -319,12 +276,6 @@ paths:
       tags:
         - projects
       parameters:
-        - name: X-User-Id
-          in: header
-          required: true
-          description: user_id(not name)
-          schema:
-            type: string
         - name: project_id
           in: path
           required: true
@@ -364,12 +315,6 @@ paths:
       tags:
         - projects
       parameters:
-        - name: X-User-Id
-          in: header
-          required: true
-          description: user_id(not name)
-          schema:
-            type: string
         - name: project_id
           in: path
           required: true
@@ -422,12 +367,6 @@ paths:
       tags:
         - projects
       parameters:
-        - name: X-User-Id
-          in: header
-          required: true
-          description: user_id(not name)
-          schema:
-            type: string
         - name: project_id
           in: path
           required: true
@@ -467,12 +406,6 @@ paths:
       tags:
         - projects
       parameters:
-        - name: X-User-Id
-          in: header
-          required: true
-          description: user_id(not name)
-          schema:
-            type: string
         - name: project_id
           in: path
           required: true
@@ -517,12 +450,6 @@ paths:
       tags:
         - projects
       parameters:
-        - name: X-User-Id
-          in: header
-          required: true
-          description: user_id(not name)
-          schema:
-            type: string
         - name: project_id
           in: path
           required: true

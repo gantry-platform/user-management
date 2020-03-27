@@ -2,6 +2,7 @@ package kr.co.inslab.exception;
 
 
 import kr.co.inslab.model.Error;
+import org.keycloak.common.VerificationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -60,5 +61,20 @@ public class GlobalDefaultExceptionHandler extends ResponseEntityExceptionHandle
         err.setMessage(message);
         return new ResponseEntity<>(err,status);
     }
+
+    //임시코드
+    @ExceptionHandler(VerificationException.class)
+    public ResponseEntity<Error> verificationException(Exception ex,HttpServletResponse response) throws Exception{
+        ex.printStackTrace();
+        Error err = new Error();
+        HttpStatus status = HttpStatus.resolve(401);
+        err.setCode(status.toString());
+        err.setMessage("Unauthorized temp");
+        return new ResponseEntity<>(err,status);
+    }
+
+
+
+
 
 }

@@ -12,6 +12,7 @@ import kr.co.inslab.model.NewProject;
 import kr.co.inslab.model.Project;
 import kr.co.inslab.model.User;
 import io.swagger.annotations.*;
+import org.keycloak.common.VerificationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,7 +29,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-03-27T11:04:51.964+09:00[Asia/Seoul]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-03-27T14:04:16.475+09:00[Asia/Seoul]")
 @Api(value = "Users", description = "the Users API")
 public interface UsersApi {
 
@@ -41,9 +42,8 @@ public interface UsersApi {
     @RequestMapping(value = "/users",
             produces = { "application/json" },
             method = RequestMethod.GET)
-    ResponseEntity<User> usersGet(@ApiParam(value = "user_id(not name)" ,required=true) @RequestHeader(value="X-User-Id", required=true) String xUserId
-            ,@ApiParam(value = "프로젝트 정보까지 포함") @Valid @RequestParam(value = "include_project", required = false) Boolean includeProject
-    );
+    ResponseEntity<User> usersGet(@ApiParam(value = "프로젝트 정보까지 포함") @Valid @RequestParam(value = "include_project", required = false) Boolean includeProject
+    ) throws VerificationException;
 
 
     @ApiOperation(value = "신규 프로젝트 생성", nickname = "usersProjectsPost", notes = "", response = Project.class, tags={ "users", })
@@ -58,7 +58,6 @@ public interface UsersApi {
             consumes = { "application/json" },
             method = RequestMethod.POST)
     ResponseEntity<Project> usersProjectsPost(@ApiParam(value = "" ,required=true )  @Valid @RequestBody NewProject body
-            ,@ApiParam(value = "user_id(not name)" ,required=true) @RequestHeader(value="X-User-Id", required=true) String xUserId
-    ) throws APIException, KeyCloakAdminException;
+    ) throws APIException, KeyCloakAdminException, VerificationException;
 
 }

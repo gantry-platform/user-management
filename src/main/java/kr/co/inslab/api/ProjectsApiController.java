@@ -9,6 +9,9 @@ import kr.co.inslab.model.Member;
 import kr.co.inslab.model.Project;
 import kr.co.inslab.model.UpdateProject;
 import kr.co.inslab.service.ProjectService;
+import org.keycloak.TokenVerifier;
+import org.keycloak.common.VerificationException;
+import org.keycloak.representations.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -63,9 +66,12 @@ public class ProjectsApiController implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<Void> projectsProjectIdActivePut(String xUserId, String projectId) throws APIException {
+    public ResponseEntity<Void> projectsProjectIdActivePut(String projectId) throws Exception {
         ResponseEntity<Void> res = null;
-        this.checkResource(xUserId,projectId);
+
+        //임시코드
+        String userId = this.getUserId(request);
+        this.checkResource(userId,projectId);
 
         Map<String,String> attrs = new HashMap<String, String>();
         attrs.put(StaticConfig.STATUS,Project.StatusEnum.ACTIVE.toString());
@@ -78,8 +84,12 @@ public class ProjectsApiController implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<Void> projectsProjectIdArchivePut(String xUserId, String projectId) throws APIException {
-        this.checkResource(xUserId,projectId);
+    public ResponseEntity<Void> projectsProjectIdArchivePut(String projectId) throws Exception {
+
+        //임시코드
+        String userId = this.getUserId(request);
+
+        this.checkResource(userId,projectId);
         ResponseEntity<Void> res = null;
         Map<String,String> attrs = new HashMap<String, String>();
 
@@ -93,13 +103,17 @@ public class ProjectsApiController implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<Void> projectsProjectIdDelete(String xUserId, String projectId) throws APIException {
+    public ResponseEntity<Void> projectsProjectIdDelete(String projectId) throws Exception {
+
+        //임시코드
+        String userId = this.getUserId(request);
+
         ResponseEntity<Void> res = null;
 
-        this.checkResource(xUserId,projectId);
+        this.checkResource(userId,projectId);
 
-        if(!projectService.isOwnerOfProject(xUserId,projectId)){
-            throw new APIException(xUserId+"is not the owner of project",HttpStatus.BAD_REQUEST);
+        if(!projectService.isOwnerOfProject(userId,projectId)){
+            throw new APIException(userId+"is not the owner of project",HttpStatus.BAD_REQUEST);
         }
 
         projectService.deleteProjectById(projectId);
@@ -110,11 +124,15 @@ public class ProjectsApiController implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<Project> projectsProjectIdGet(String xUserId, String projectId) throws APIException {
-        ResponseEntity<Project> res = null;
-        this.checkResource(xUserId,projectId);
+    public ResponseEntity<Project> projectsProjectIdGet(String projectId) throws Exception {
 
-        Boolean existsUserInProject = projectService.existsUserInProject(xUserId,projectId);
+        //임시코드
+        String userId = this.getUserId(request);
+
+        ResponseEntity<Project> res = null;
+        this.checkResource(userId,projectId);
+
+        Boolean existsUserInProject = projectService.existsUserInProject(userId,projectId);
 
         if(!existsUserInProject){
             throw new APIException("Does Not Exists User In Project",HttpStatus.BAD_REQUEST);
@@ -126,10 +144,14 @@ public class ProjectsApiController implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<List<Group>> projectsProjectIdGroupsGet(String xUserId, String projectId) throws APIException {
+    public ResponseEntity<List<Group>> projectsProjectIdGroupsGet(String projectId) throws Exception {
+
+        //임시코드
+        String userId = this.getUserId(request);
+
         ResponseEntity<List<Group>> res = null;
 
-        this.checkResource(xUserId,projectId);
+        this.checkResource(userId,projectId);
 
         List<Group> groups = projectService.getGroupsByProjectId(projectId);
 
@@ -138,10 +160,13 @@ public class ProjectsApiController implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<Void> projectsProjectIdGroupsGroupIdInvitationPut(String xUserId, String projectId, String groupId, @NotNull @Valid String email) throws APIException, KeyCloakAdminException {
+    public ResponseEntity<Void> projectsProjectIdGroupsGroupIdInvitationPut(String projectId, String groupId, @NotNull @Valid String email) throws Exception {
         ResponseEntity<Void> res = null;
 
-        this.checkResource(xUserId,projectId);
+        //임시코드
+        String userId = this.getUserId(request);
+
+        this.checkResource(userId,projectId);
         projectService.inviteUserToGroup(email,projectId,groupId);
         res = new ResponseEntity<Void>(HttpStatus.OK);
 
@@ -149,21 +174,30 @@ public class ProjectsApiController implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<List<Member>> projectsProjectIdGroupsGroupIdMembersGet(String xUserId, String projectId, String groupId) throws APIException {
+    public ResponseEntity<List<Member>> projectsProjectIdGroupsGroupIdMembersGet(String projectId, String groupId) throws Exception {
+
+        //임시코드
+        String userId = this.getUserId(request);
+
+
         ResponseEntity<List<Member>> res = null;
-        this.checkResource(xUserId,projectId);
+        this.checkResource(userId,projectId);
         List<Member> members = projectService.getSubGroupMember(projectId,groupId);
         res = new ResponseEntity<List<Member>>(members,HttpStatus.OK);
         return res;
     }
 
     @Override
-    public ResponseEntity<Void> projectsProjectIdGroupsGroupIdMembersPatch(String xUserId, String projectId, String groupId, @NotNull @Valid String memberId) throws APIException {
-        ResponseEntity<Void> res = null;
-        this.checkResource(xUserId,projectId);
+    public ResponseEntity<Void> projectsProjectIdGroupsGroupIdMembersPatch(String projectId, String groupId, @NotNull @Valid String memberId) throws Exception {
 
-        if(!projectService.isOwnerOfProject(xUserId,projectId)){
-            throw new APIException(xUserId+"is not the owner of project",HttpStatus.BAD_REQUEST);
+        //임시코드
+        String userId = this.getUserId(request);
+
+        ResponseEntity<Void> res = null;
+        this.checkResource(userId,projectId);
+
+        if(!projectService.isOwnerOfProject(userId,projectId)){
+            throw new APIException(userId+"is not the owner of project",HttpStatus.BAD_REQUEST);
         }
 
         projectService.moveGroupOfMember(projectId,groupId,memberId);
@@ -173,13 +207,17 @@ public class ProjectsApiController implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<Void> projectsProjectIdMembersMemberIdDelete(String xUserId, String projectId, String memberId) throws APIException {
+    public ResponseEntity<Void> projectsProjectIdMembersMemberIdDelete(String projectId, String memberId) throws Exception {
+
+        //임시코드
+        String userId = this.getUserId(request);
+
         ResponseEntity<Void> res = null;
 
-        this.checkResource(xUserId,projectId);
+        this.checkResource(userId,projectId);
 
-        if(!projectService.isOwnerOfProject(xUserId,projectId)){
-            throw new APIException(xUserId+"is not the owner of project",HttpStatus.BAD_REQUEST);
+        if(!projectService.isOwnerOfProject(userId,projectId)){
+            throw new APIException(userId+"is not the owner of project",HttpStatus.BAD_REQUEST);
         }
         projectService.deleteProjectById(projectId);
 
@@ -189,16 +227,21 @@ public class ProjectsApiController implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<Void> projectsProjectIdPatch(@Valid UpdateProject body, String xUserId, String projectId) throws APIException {
+    public ResponseEntity<Void> projectsProjectIdPatch(@Valid UpdateProject body,String projectId) throws Exception {
+
+        //임시코드
+        String userId = this.getUserId(request);
+
+
         ResponseEntity<Void> res = null;
         Map<String,String> attrs = null;
         String owner = body.getOwner();
         String description = body.getDescription();
 
-        this.checkResource(xUserId,projectId);
+        this.checkResource(userId,projectId);
 
-        if(!projectService.isOwnerOfProject(xUserId,projectId)){
-            throw new APIException(xUserId+"is not the owner of project",HttpStatus.BAD_REQUEST);
+        if(!projectService.isOwnerOfProject(userId,projectId)){
+            throw new APIException(userId+"is not the owner of project",HttpStatus.BAD_REQUEST);
         }
 
         if(!owner.isEmpty() || !description.isEmpty()){
@@ -216,5 +259,19 @@ public class ProjectsApiController implements ProjectsApi {
         res = new ResponseEntity<Void>(HttpStatus.OK);
 
         return res;
+    }
+
+
+    //임시코드
+    private final String getUserId(HttpServletRequest request) throws Exception {
+        String userId = null;
+        String token = request.getHeader("Authorization");
+        if (token != null && !token.isEmpty()) {
+            String[] splitToken = token.split(" ");
+            AccessToken accessToken = TokenVerifier.create(splitToken[1], AccessToken.class).getToken();
+            accessToken.getId();
+
+        }
+        return userId;
     }
 }
