@@ -5,31 +5,24 @@
  */
 package kr.co.inslab.api;
 
-import kr.co.inslab.exception.APIException;
 import kr.co.inslab.model.Error;
 import kr.co.inslab.model.Group;
 import kr.co.inslab.model.Member;
 import kr.co.inslab.model.Project;
 import kr.co.inslab.model.UpdateProject;
 import io.swagger.annotations.*;
-import org.keycloak.common.VerificationException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.bind.annotation.CookieValue;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.List;
-import java.util.Map;
+
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-03-27T14:04:16.475+09:00[Asia/Seoul]")
 @Api(value = "Projects", description = "the Projects API")
 public interface ProjectsApi {

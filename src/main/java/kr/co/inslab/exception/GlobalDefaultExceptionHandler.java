@@ -29,11 +29,11 @@ public class GlobalDefaultExceptionHandler extends ResponseEntityExceptionHandle
 
     }
 
-    @ExceptionHandler(APIException.class)
+    @ExceptionHandler(ApiException.class)
     public ResponseEntity<Error> apiExceptionHandler(Exception ex,HttpServletResponse response) throws Exception{
         ex.printStackTrace();
         Error err = new Error();
-        HttpStatus status = ((APIException) ex).getHttpStatus();
+        HttpStatus status = ((ApiException) ex).getHttpStatus();
         err.setCode(status.toString());
         err.setMessage(ex.getMessage());
         return new ResponseEntity<>(err,status);

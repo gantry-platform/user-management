@@ -1,7 +1,7 @@
 package kr.co.inslab.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.inslab.exception.APIException;
+import kr.co.inslab.exception.ApiException;
 import kr.co.inslab.exception.KeyCloakAdminException;
 import kr.co.inslab.model.NewProject;
 import kr.co.inslab.model.Project;
@@ -57,7 +57,7 @@ public class UsersApiController implements UsersApi {
     }
 
     @Override
-    public ResponseEntity<Project> usersProjectsPost(NewProject body) throws APIException, KeyCloakAdminException, VerificationException {
+    public ResponseEntity<Project> usersProjectsPost(NewProject body) throws ApiException, KeyCloakAdminException, VerificationException {
         //임시코드
         String userId = this.getUserId(request);
 
@@ -79,7 +79,7 @@ public class UsersApiController implements UsersApi {
             String[] splitToken = token.split(" ");
             System.out.println(splitToken[1]);
             AccessToken accessToken = TokenVerifier.create(splitToken[1], AccessToken.class).getToken();
-            accessToken.getId();
+            userId = accessToken.getId();
 
         }
         return userId;

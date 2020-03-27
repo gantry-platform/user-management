@@ -1,9 +1,8 @@
 package kr.co.inslab.service;
 
 
-import kr.co.inslab.bootstrap.KeyCloakAdminConfig;
 import kr.co.inslab.bootstrap.StaticConfig;
-import kr.co.inslab.exception.APIException;
+import kr.co.inslab.exception.ApiException;
 import kr.co.inslab.exception.KeyCloakAdminException;
 import kr.co.inslab.keycloak.*;
 import kr.co.inslab.model.Project;
@@ -36,7 +35,7 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
 
 
     @Override
-    public Project createProject(String userId, String displayName, String description) throws KeyCloakAdminException, APIException {
+    public Project createProject(String userId, String displayName, String description) throws KeyCloakAdminException, ApiException {
         String projectName = userId+"_"+displayName;
         String adminGroupName = SubGroup.ADMIN.toString();
         String opsGroupName = SubGroup.OPS.toString();
@@ -65,7 +64,7 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
         } catch (Exception e){
             if(projectGroupRep != null){
                 this.removeGroupById(projectGroupRep.getId());
-                throw new APIException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                throw new ApiException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
             if (e instanceof KeyCloakAdminException){
                 throw e;
@@ -81,14 +80,14 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
     }
 
     @Override
-    public void checkUserById(String userId) throws APIException{
+    public void checkUserById(String userId) throws ApiException {
         try{
             this.getUserResourceById(userId).toRepresentation();
         }catch (Exception e){
             if(e instanceof javax.ws.rs.WebApplicationException) {
                 String message = ((WebApplicationException)e).getResponse().getStatusInfo().getReasonPhrase();
                 int code = ((WebApplicationException)e).getResponse().getStatusInfo().getStatusCode();
-                throw new APIException("[user_id : "+userId+"] "+ message, HttpStatus.resolve(code));
+                throw new ApiException("[user_id : "+userId+"] "+ message, HttpStatus.resolve(code));
             }
             throw e;
         }

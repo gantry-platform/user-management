@@ -1,10 +1,9 @@
 package kr.co.inslab.service;
 
 
-import kr.co.inslab.exception.APIException;
+import kr.co.inslab.exception.ApiException;
 import kr.co.inslab.exception.KeyCloakAdminException;
 import kr.co.inslab.keycloak.AbstractKeyCloak;
-import kr.co.inslab.bootstrap.KeyCloakAdminConfig;
 import kr.co.inslab.bootstrap.StaticConfig;
 import kr.co.inslab.model.Group;
 import kr.co.inslab.model.Member;
@@ -65,14 +64,14 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
     }
 
     @Override
-    public void checkUserById(String userId) throws APIException{
+    public void checkUserById(String userId) throws ApiException {
         try{
             this.getUserResourceById(userId).toRepresentation();
         }catch (Exception e){
             if(e instanceof javax.ws.rs.WebApplicationException) {
                 String message = ((WebApplicationException)e).getResponse().getStatusInfo().getReasonPhrase();
                 int code = ((WebApplicationException)e).getResponse().getStatusInfo().getStatusCode();
-                throw new APIException("[user_id : "+userId+"] "+message, HttpStatus.resolve(code));
+                throw new ApiException("[user_id : "+userId+"] "+message, HttpStatus.resolve(code));
             }
             throw e;
         }
@@ -80,7 +79,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
 
     @Override
-    public Project getProjectById(String projectId) throws APIException{
+    public Project getProjectById(String projectId) throws ApiException {
         GroupRepresentation groupRepresentation = null;
         try{
             groupRepresentation = this.getGroupById(projectId);
@@ -88,7 +87,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
             if(e instanceof javax.ws.rs.WebApplicationException) {
                 String message = ((WebApplicationException)e).getResponse().getStatusInfo().getReasonPhrase();
                 int code = ((WebApplicationException)e).getResponse().getStatusInfo().getStatusCode();
-                throw new APIException("[project_id : "+projectId+"] "+message, HttpStatus.resolve(code));
+                throw new ApiException("[project_id : "+projectId+"] "+message, HttpStatus.resolve(code));
             }
             throw e;
         }
@@ -150,7 +149,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
     }
 
     @Override
-    public List<Group> getGroupsByProjectId(String projectId) throws APIException{
+    public List<Group> getGroupsByProjectId(String projectId) throws ApiException {
         List<Group> groups = null;
         Project project = this.getProjectById(projectId);
         groups = project.getGroups();
@@ -158,7 +157,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
     }
 
     @Override
-    public void inviteUserToGroup(String email,String projectId,String groupId) throws KeyCloakAdminException, APIException {
+    public void inviteUserToGroup(String email,String projectId,String groupId) throws KeyCloakAdminException, ApiException {
 
         List<UserRepresentation> userRepresentations = this.getUserByEmail(email);
 
@@ -197,7 +196,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
                 logger.debug(userRepresentation.getEmail());
             }
             logger.error("Multiple Users Exception");
-            throw new APIException("Multiple Users Exception",HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ApiException("Multiple Users Exception",HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

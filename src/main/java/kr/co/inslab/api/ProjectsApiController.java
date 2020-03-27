@@ -1,16 +1,14 @@
 package kr.co.inslab.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.inslab.exception.APIException;
+import kr.co.inslab.exception.ApiException;
 import kr.co.inslab.bootstrap.StaticConfig;
-import kr.co.inslab.exception.KeyCloakAdminException;
 import kr.co.inslab.model.Group;
 import kr.co.inslab.model.Member;
 import kr.co.inslab.model.Project;
 import kr.co.inslab.model.UpdateProject;
 import kr.co.inslab.service.ProjectService;
 import org.keycloak.TokenVerifier;
-import org.keycloak.common.VerificationException;
 import org.keycloak.representations.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +44,7 @@ public class ProjectsApiController implements ProjectsApi {
     }
 
     //TODO: interceptor나 adviser로변경
-    private void checkResource(String userId,String projectId) throws APIException {
+    private void checkResource(String userId,String projectId) throws ApiException {
         projectService.checkUserById(userId);
         projectService.checkProjectByProjectId(projectId);
     }
@@ -113,7 +111,7 @@ public class ProjectsApiController implements ProjectsApi {
         this.checkResource(userId,projectId);
 
         if(!projectService.isOwnerOfProject(userId,projectId)){
-            throw new APIException(userId+"is not the owner of project",HttpStatus.BAD_REQUEST);
+            throw new ApiException(userId+"is not the owner of project",HttpStatus.BAD_REQUEST);
         }
 
         projectService.deleteProjectById(projectId);
@@ -135,7 +133,7 @@ public class ProjectsApiController implements ProjectsApi {
         Boolean existsUserInProject = projectService.existsUserInProject(userId,projectId);
 
         if(!existsUserInProject){
-            throw new APIException("Does Not Exists User In Project",HttpStatus.BAD_REQUEST);
+            throw new ApiException("Does Not Exists User In Project",HttpStatus.BAD_REQUEST);
         }
 
         Project project = projectService.getProjectById(projectId);
@@ -197,7 +195,7 @@ public class ProjectsApiController implements ProjectsApi {
         this.checkResource(userId,projectId);
 
         if(!projectService.isAdminOfProject(userId,projectId)){
-            throw new APIException(userId+"is not the admin of the project",HttpStatus.BAD_REQUEST);
+            throw new ApiException(userId+"is not the admin of the project",HttpStatus.BAD_REQUEST);
         }
 
         projectService.moveGroupOfMember(projectId,groupId,memberId);
@@ -217,7 +215,7 @@ public class ProjectsApiController implements ProjectsApi {
         this.checkResource(userId,projectId);
 
         if(!projectService.isAdminOfProject(userId,projectId)){
-            throw new APIException(userId+"is not the admin of the project",HttpStatus.BAD_REQUEST);
+            throw new ApiException(userId+"is not the admin of the project",HttpStatus.BAD_REQUEST);
         }
 
         projectService.deleteProjectById(projectId);
@@ -242,7 +240,7 @@ public class ProjectsApiController implements ProjectsApi {
         this.checkResource(userId,projectId);
 
         if(!projectService.isOwnerOfProject(userId,projectId)){
-            throw new APIException(userId+"is not the owner of project",HttpStatus.BAD_REQUEST);
+            throw new ApiException(userId+"is not the owner of project",HttpStatus.BAD_REQUEST);
         }
 
         if(!owner.isEmpty() || !description.isEmpty()){
@@ -270,7 +268,7 @@ public class ProjectsApiController implements ProjectsApi {
         if (token != null && !token.isEmpty()) {
             String[] splitToken = token.split(" ");
             AccessToken accessToken = TokenVerifier.create(splitToken[1], AccessToken.class).getToken();
-            accessToken.getId();
+            userId = accessToken.getId();
 
         }
         return userId;
