@@ -218,7 +218,7 @@ public class ProjectsApiController implements ProjectsApi {
             throw new ApiException(userId+"is not the admin of the project",HttpStatus.BAD_REQUEST);
         }
 
-        projectService.deleteProjectById(projectId);
+        projectService.deleteMemberInProject(projectId,memberId);
 
         res = new ResponseEntity<Void>(HttpStatus.OK);
 

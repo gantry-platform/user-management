@@ -145,7 +145,14 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
     @Override
     public void deleteProjectById(String projectId) {
+
         this.removeGroupById(projectId);
+    }
+
+    @Override
+    public void deleteMemberInProject(String projectId, String memberId) {
+
+        this.leaveGroup(memberId,projectId);
     }
 
     @Override

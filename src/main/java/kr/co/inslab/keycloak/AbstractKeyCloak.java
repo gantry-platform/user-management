@@ -97,7 +97,6 @@ public abstract class AbstractKeyCloak {
 
     protected void leaveGroup(String userId,String groupId) {
         this.getRealm().users().get(userId).leaveGroup(groupId);
-
     }
 
     protected GroupRepresentation getGroupById(String groupId) {
@@ -123,6 +122,7 @@ public abstract class AbstractKeyCloak {
     }
 
     protected void removeGroupById(String groupId){
+
         this.getRealm().groups().group(groupId).remove();
     }
 
