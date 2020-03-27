@@ -35,7 +35,7 @@ public interface UsersApi {
             produces = { "application/json" },
             method = RequestMethod.GET)
     ResponseEntity<User> usersGet(@ApiParam(value = "프로젝트 정보까지 포함") @Valid @RequestParam(value = "include_project", required = false) Boolean includeProject
-    ) throws VerificationException;
+    ) throws Exception;
 
 
     @ApiOperation(value = "신규 프로젝트 생성", nickname = "usersProjectsPost", notes = "", response = Project.class, tags={ "users", })
@@ -50,6 +50,6 @@ public interface UsersApi {
             consumes = { "application/json" },
             method = RequestMethod.POST)
     ResponseEntity<Project> usersProjectsPost(@ApiParam(value = "" ,required=true )  @Valid @RequestBody NewProject body
-    ) throws ApiException, KeyCloakAdminException, VerificationException;
+    ) throws Exception;
 
 }

@@ -40,10 +40,12 @@ public class UsersApiController implements UsersApi {
 
 
     @Override
-    public ResponseEntity<User> usersGet(@Valid Boolean includeProject) throws VerificationException {
+    public ResponseEntity<User> usersGet(@Valid Boolean includeProject) throws Exception {
 
         //임시코드
         String userId = this.getUserId(request);
+
+        userService.checkUserById(userId);
 
         if(includeProject==null){
             includeProject=false;
@@ -57,9 +59,10 @@ public class UsersApiController implements UsersApi {
     }
 
     @Override
-    public ResponseEntity<Project> usersProjectsPost(NewProject body) throws ApiException, KeyCloakAdminException, VerificationException {
+    public ResponseEntity<Project> usersProjectsPost(NewProject body) throws Exception {
         //임시코드
         String userId = this.getUserId(request);
+        userService.checkUserById(userId);
 
         String displayName = body.getDisplayName();
         String description = body.getDescription();

@@ -80,21 +80,6 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
     }
 
     @Override
-    public void checkUserById(String userId) throws ApiException {
-        try{
-            this.getUserResourceById(userId).toRepresentation();
-        }catch (Exception e){
-            if(e instanceof javax.ws.rs.WebApplicationException) {
-                String message = ((WebApplicationException)e).getResponse().getStatusInfo().getReasonPhrase();
-                int code = ((WebApplicationException)e).getResponse().getStatusInfo().getStatusCode();
-                throw new ApiException("[user_id : "+userId+"] "+ message, HttpStatus.resolve(code));
-            }
-            throw e;
-        }
-    }
-
-
-    @Override
     public User getUserInfoById(String userId,Boolean includeProject){
         UserResource userResource = this.getUserResourceById(userId);
         UserRepresentation gantryUser = userResource.toRepresentation();
@@ -121,6 +106,19 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
         return user;
     }
 
+    @Override
+    public void checkUserById(String userId) throws ApiException {
+        try{
+            this.getUserResourceById(userId).toRepresentation();
+        }catch (Exception e){
+            if(e instanceof javax.ws.rs.WebApplicationException) {
+                String message = ((WebApplicationException)e).getResponse().getStatusInfo().getReasonPhrase();
+                int code = ((WebApplicationException)e).getResponse().getStatusInfo().getStatusCode();
+                throw new ApiException("[user_id : "+userId+"] "+message, HttpStatus.resolve(code));
+            }
+            throw e;
+        }
+    }
 
     private User newUser(UserRepresentation userRepresentation){
         User user = new User();
