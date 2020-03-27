@@ -79,8 +79,8 @@ public class UsersApiController implements UsersApi {
             String[] splitToken = token.split(" ");
             System.out.println(splitToken[1]);
             AccessToken accessToken = TokenVerifier.create(splitToken[1], AccessToken.class).getToken();
-            userId = accessToken.getId();
-
+            userId = accessToken.getSubject();
+            logger.debug("subject:"+userId);
         }
         return userId;
     }
