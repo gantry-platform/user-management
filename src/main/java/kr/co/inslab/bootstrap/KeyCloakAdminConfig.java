@@ -27,7 +27,7 @@ public class KeyCloakAdminConfig {
 
     @Bean
     public Keycloak keycloakAdmin(){
-        Keycloak keycloak= KeycloakBuilder.builder()
+        return KeycloakBuilder.builder()
                 .serverUrl(SERVER_URL)
                 .realm(MASTER_REALM)
                 .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
@@ -35,7 +35,6 @@ public class KeyCloakAdminConfig {
                 .clientSecret(CLIENT_SECRET)
                 .resteasyClient(new ResteasyClientBuilder().connectionPoolSize(20).build())
                 .build();
-        return keycloak;
     }
 }
 

@@ -31,7 +31,7 @@ public class LoggingServiceImpl implements LoggingService {
         }
 
         if (body != null) {
-            stringBuilder.append("body=[" + body + "]");
+            stringBuilder.append("body=[").append(body).append("]");
         }
 
         logger.info(stringBuilder.toString());
@@ -39,14 +39,13 @@ public class LoggingServiceImpl implements LoggingService {
 
     @Override
     public void logResponse(HttpServletRequest request, HttpServletResponse response, Object body) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("RESPONSE ");
-        stringBuilder.append("method=[").append(request.getMethod()).append("] ");
-        stringBuilder.append("path=[").append(request.getRequestURI()).append("] ");
-        stringBuilder.append("responseHeaders=[").append(buildHeadersMap(response)).append("] ");
-        stringBuilder.append("responseBody=[").append(body).append("] ");
 
-        logger.info(stringBuilder.toString());
+        String responseInfo = "RESPONSE " +
+                "method=[" + request.getMethod() + "] " +
+                "path=[" + request.getRequestURI() + "] " +
+                "responseHeaders=[" + buildHeadersMap(response) + "] " +
+                "responseBody=[" + body + "] ";
+        logger.info(responseInfo);
     }
 
     private Map<String, String> buildParametersMap(HttpServletRequest httpServletRequest) {
@@ -65,9 +64,9 @@ public class LoggingServiceImpl implements LoggingService {
     private Map<String, String> buildHeadersMap(HttpServletRequest request) {
         Map<String, String> map = new HashMap<>();
 
-        Enumeration headerNames = request.getHeaderNames();
+        Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
-            String key = (String) headerNames.nextElement();
+            String key = headerNames.nextElement();
             String value = request.getHeader(key);
             map.put(key, value);
         }

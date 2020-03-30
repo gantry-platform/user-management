@@ -39,18 +39,15 @@ public abstract class AbstractKeyCloak {
 
 
     protected List<UserRepresentation> getUserByEmail(String email){
-        List<UserRepresentation> userRepresentations= this.getRealm().users().search(null,null,null,email,0,10);
-        return userRepresentations;
+        return this.getRealm().users().search(null,null,null,email,0,10);
     }
 
     protected UserResource getUserResourceById(String userId) {
-        UserResource userResource = this.getRealm().users().get(userId);
-        return userResource;
+        return this.getRealm().users().get(userId);
     }
 
     protected List<UserRepresentation> getMembersByGroupId(String groupId) {
-        List<UserRepresentation> userRepresentations = this.getRealm().groups().group(groupId).members();
-        return userRepresentations;
+        return this.getRealm().groups().group(groupId).members();
     }
 
     protected GroupRepresentation createGroup(String groupName, Map<String,String> groupAttr) throws KeyCloakAdminException {
@@ -90,7 +87,7 @@ public abstract class AbstractKeyCloak {
     protected void addRoleToGroup(GroupRepresentation targetGroup, Role role) {
         RoleResource roleResource = this.getRealm().roles().get(role.toString());
         RoleRepresentation roleRepresentation = roleResource.toRepresentation();
-        List<RoleRepresentation> roleRepresentations = new ArrayList<RoleRepresentation>();
+        List<RoleRepresentation> roleRepresentations = new ArrayList<>();
         roleRepresentations.add(roleRepresentation);
         this.getRealm().groups().group(targetGroup.getId()).roles().realmLevel().add(roleRepresentations);
     }
@@ -100,17 +97,11 @@ public abstract class AbstractKeyCloak {
     }
 
     protected GroupRepresentation getGroupById(String groupId) {
-        GroupRepresentation groupRepresentation = this.getRealm().groups().group(groupId).toRepresentation();
-        return groupRepresentation;
-    }
-    protected GroupRepresentation getGroupByGroupPath(String groupPath) {
-        GroupRepresentation groupRepresentation = this.getRealm().getGroupByPath(groupPath);
-        return groupRepresentation;
+        return this.getRealm().groups().group(groupId).toRepresentation();
     }
 
     protected List<GroupRepresentation> getGroupsByUserId(String userId) {
-        List<GroupRepresentation> groupRepresentations = this.getRealm().users().get(userId).groups();
-        return groupRepresentations;
+        return this.getRealm().users().get(userId).groups();
     }
 
     protected void updateGroup(String groupId, GroupRepresentation groupRepresentation){
@@ -180,9 +171,9 @@ public abstract class AbstractKeyCloak {
         }
         return project;
     }
-    private final List<Group> addSubGroupsInfo(List<GroupRepresentation> subGroups) {
+    private List<Group> addSubGroupsInfo(List<GroupRepresentation> subGroups) {
 
-        List<Group> groups = new ArrayList<Group>();
+        List<Group> groups = new ArrayList<>();
         for (GroupRepresentation gantryGroup : subGroups) {
             Group group = new Group();
             group.setId(gantryGroup.getId());

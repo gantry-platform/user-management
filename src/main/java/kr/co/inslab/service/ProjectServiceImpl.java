@@ -36,8 +36,6 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
     private final MailSendingService mailSendingService;
 
-    private final String NO_REPLY_GANTRY_AI = "noreply@gantry.ai";
-
     private final HTMLTemplate htmlTemplate;
 
 
@@ -51,7 +49,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
     @Override
     public Boolean existsUserInProject(String userId, String projectId){
-        Boolean existsUserInProject = false;
+        boolean existsUserInProject = false;
         List<GroupRepresentation> groupRepresentations = this.getGroupsByUserId(userId);
 
         for(GroupRepresentation groupRepresentation : groupRepresentations){
@@ -80,7 +78,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
     @Override
     public Project getProjectById(String projectId) throws ApiException {
-        GroupRepresentation groupRepresentation = null;
+        GroupRepresentation groupRepresentation ;
         try{
             groupRepresentation = this.getGroupById(projectId);
         }catch (Exception e){
@@ -92,16 +90,26 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
             throw e;
         }
 
-        Project project = makeProjectInfo(groupRepresentation);
-        return project;
+        return makeProjectInfo(groupRepresentation);
     }
 
     @Override
-    public void updateProjectInfo(String projectId, Map<String,String> attrs) {
+    public void updateProjectInfo(String projectId, Map<String,String> attrs) throws ApiException {
 
-        GroupRepresentation groupRepresentation = this.getGroupById(projectId);
+        GroupRepresentation groupRepresentation ;
 
-        if(attrs != null){
+        try{
+            groupRepresentation = this.getGroupById(projectId);
+        }catch (Exception e){
+            if(e instanceof javax.ws.rs.WebApplicationException) {
+                String message = ((WebApplicationException)e).getResponse().getStatusInfo().getReasonPhrase();
+                int code = ((WebApplicationException)e).getResponse().getStatusInfo().getStatusCode();
+                throw new ApiException("[project_id : "+projectId+"] "+message, HttpStatus.resolve(code));
+            }
+            throw e;
+        }
+
+        if(null != attrs){
             for(String key:attrs.keySet()){
                 groupRepresentation.singleAttribute(key,attrs.get(key));
             }
@@ -113,7 +121,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
     @Override
     public Boolean isOwnerOfProject(String userId,String projectId) {
-        Boolean isOwner = false;
+        boolean isOwner = false;
         GroupRepresentation groupRepresentation = this.getGroupById(projectId);
         Project project = this.makeProjectMetaInfo(groupRepresentation);
         if (project.getOwner().equals(userId)){
@@ -124,7 +132,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
     @Override
     public Boolean isAdminOfProject(String userId, String projectId) {
-        Boolean isAdmin = false;
+        boolean isAdmin = false;
         GroupRepresentation groupRepresentation = this.getGroupById(projectId);
         List<GroupRepresentation> subGroups = groupRepresentation.getSubGroups();
 
@@ -151,16 +159,17 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
     @Override
     public void deleteMemberInProject(String projectId, String memberId) {
+        List<GroupRepresentation> memberGroups = this.getGroupsByUserId(memberId);
 
-        this.leaveGroup(memberId,projectId);
+        for(GroupRepresentation memberGroup : memberGroups){
+            this.leaveGroup(memberId, memberGroup.getId());
+        }
     }
 
     @Override
     public List<Group> getGroupsByProjectId(String projectId) throws ApiException {
-        List<Group> groups = null;
         Project project = this.getProjectById(projectId);
-        groups = project.getGroups();
-        return groups;
+        return project.getGroups();
     }
 
     @Override
@@ -169,7 +178,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
         List<UserRepresentation> userRepresentations = this.getUserByEmail(email);
 
         //New User
-        if(userRepresentations == null || userRepresentations.size() == 0){
+        if((null == userRepresentations) || (userRepresentations.size() == 0)){
             //TODO: 생성 error 처리 추가해야 함
             GroupRepresentation topGroup = this.getGroupById(projectId);
             GroupRepresentation subGroup = this.getGroupById(groupId);
@@ -194,7 +203,8 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
             //Send email
             String inviteHtml = htmlTemplate.makeInviteHtml(StaticConfig.INVITE,token);
-            mailSendingService.sendHtmlEmail(NO_REPLY_GANTRY_AI,email,StaticConfig.GANTRY+"["+projectName+"]초대 메일",inviteHtml);
+
+            mailSendingService.sendHtmlEmail(StaticConfig.NO_REPLY_GANTRY_AI,email,StaticConfig.GANTRY+"["+projectName+"]초대 메일",inviteHtml);
             this.addPendingUser(topGroup,email);
 
         //Multiple Users
@@ -214,7 +224,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
     @Override
     public List<Member> getSubGroupMember(String projectId,String groupId) {
-        List<Member> members = new ArrayList<Member>();
+        List<Member> members = new ArrayList<>();
 
         GroupRepresentation groupRepresentation = this.getGroupById(groupId);
         List<UserRepresentation> userRepresentations = this.getMembersByGroupId(groupRepresentation.getId());
@@ -250,9 +260,10 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
         ValueOperations<String,Object> valueOperations = redisTemplate.opsForValue();
 
+        @SuppressWarnings("unchecked")
         HashMap<String,String> joinInfo = (HashMap<String, String>) valueOperations.get(token);
 
-        if(joinInfo != null){
+        if(null != joinInfo){
             String groupId = joinInfo.get(StaticConfig.GROUP_ID);
             String projectId = joinInfo.get(StaticConfig.PROJECT_ID);
             String userId = joinInfo.get(StaticConfig.USER_ID);
@@ -273,19 +284,19 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
         Map<String,String> joinInfo = new HashMap<>();
         joinInfo.put(StaticConfig.PROJECT_ID,projectId);
         joinInfo.put(StaticConfig.GROUP_ID,groupId);
-        joinInfo.put(StaticConfig.USER_ID,groupId);
+        joinInfo.put(StaticConfig.USER_ID,userId);
         joinInfo.put(StaticConfig.EMAIL,email);
         return joinInfo;
     }
 
-    private final void addPendingUser(GroupRepresentation groupRepresentation,String email){
-        Map<String, List<String>> projectAttrs = null;
-        List<String> pendingUsers = null;
+    private void addPendingUser(GroupRepresentation groupRepresentation, String email){
+        Map<String, List<String>> projectAttrs;
+        List<String> pendingUsers;
 
         projectAttrs = groupRepresentation.getAttributes();
         pendingUsers = projectAttrs.get(StaticConfig.PENDING);
 
-        if(pendingUsers == null){
+        if(null == pendingUsers){
             pendingUsers = new ArrayList<>();
         }
 
@@ -299,8 +310,8 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
     }
 
     public void removePendingUser(GroupRepresentation groupRepresentation,String email) {
-        Map<String, List<String>> projectAttrs = null;
-        List<String> pendingUsers = null;
+        Map<String, List<String>> projectAttrs ;
+        List<String> pendingUsers ;
 
         projectAttrs = groupRepresentation.getAttributes();
         pendingUsers = projectAttrs.get(StaticConfig.PENDING);
@@ -322,7 +333,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
         userRepresentation.setEmail(email);
         userRepresentation.setUsername(splitEmail[0]);
 
-        List<String> actions = new ArrayList<String>();
+        List<String> actions = new ArrayList<>();
         actions.add(StaticConfig.UPDATE_PROFILE);
         actions.add(StaticConfig.UPDATE_PASSWORD);
         actions.add(StaticConfig.VERIFY_EMAIL);

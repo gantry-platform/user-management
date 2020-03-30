@@ -72,9 +72,4 @@ public class GlobalDefaultExceptionHandler extends ResponseEntityExceptionHandle
         err.setMessage("Unauthorized temp");
         return new ResponseEntity<>(err,status);
     }
-
-
-
-
-
 }

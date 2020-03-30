@@ -20,4 +20,5 @@ public class StaticConfig {
     public final static String GANTRY = "GANTRY";
     public final static String EMAIL = "email";
     public final static String INVITE = "invite";
+    public final static String NO_REPLY_GANTRY_AI = "noreply@gantry.ai";
 }

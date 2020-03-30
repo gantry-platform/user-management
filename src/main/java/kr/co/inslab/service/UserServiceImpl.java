@@ -36,13 +36,15 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
 
     @Override
     public Project createProject(String userId, String displayName, String description) throws KeyCloakAdminException, ApiException {
+
+        String projectId = null;
         String projectName = userId+"_"+displayName;
         String adminGroupName = SubGroup.ADMIN.toString();
         String opsGroupName = SubGroup.OPS.toString();
         String devGroupName = SubGroup.DEV.toString();
 
         GroupRepresentation projectGroupRep = null;
-        Map<String,String> groupAttr = new HashMap<String,String>();
+        Map<String,String> groupAttr = new HashMap<>();
 
         groupAttr.put(StaticConfig.DISPLAY_NAME,displayName);
         groupAttr.put(StaticConfig.OWNER,userId);
@@ -53,6 +55,7 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
         }
         try{
             projectGroupRep = this.createGroup(projectName,groupAttr);
+            projectId = projectGroupRep.getId();
             GroupRepresentation adminGroupRep = this.addSubGroup(projectGroupRep, adminGroupName);
             GroupRepresentation opsGroupRep = this.addSubGroup(projectGroupRep, opsGroupName);
             GroupRepresentation devGroupRep = this.addSubGroup(projectGroupRep, devGroupName);
@@ -74,7 +77,7 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
         Project project = new Project();
         project.setDisplayName(displayName);
         project.setName(projectName);
-        project.setId(projectGroupRep.getId());
+        project.setId(projectId);
 
         return project;
     }
@@ -88,10 +91,10 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
         User user = this.newUser(gantryUser);
 
         if (gantryProjects != null && gantryProjects.size() > 0){
-            List<Project> projects = new ArrayList<Project>();
+            List<Project> projects = new ArrayList<>();
             for(GroupRepresentation gantryProject: gantryProjects){
                 GroupRepresentation groupRepresentation = this.getGroupById(gantryProject.getId());
-                Project project = null;
+                Project project;
                 if(includeProject){
                     project = this.makeProjectInfo(groupRepresentation);
                 }else{
