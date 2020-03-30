@@ -14,11 +14,11 @@ public class HTMLTemplate {
         this.templateEngine = templateEngine;
     }
 
-    public String makeInviteHtml(String htmlName,String token){
+    public String makeInviteHtml(String htmlName,String token,String email){
         Context context = new Context();
         context.setVariable(StaticConfig.TOKEN, token);
-        String html = templateEngine.process(htmlName, context);
-        return html;
+        context.setVariable(StaticConfig.EMAIL, email);
+        return templateEngine.process(htmlName, context);
     }
 
 }

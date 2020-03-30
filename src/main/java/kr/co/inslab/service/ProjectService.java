@@ -18,10 +18,11 @@ public interface ProjectService {
      Boolean isAdminOfProject(String userId,String projectId);
      void deleteProjectById(String projectId);
      void deleteMemberInProject(String projectId,String memberId);
+     void deleteMemberInPending(String email,String projectId) throws ApiException;
      List<Group> getGroupsByProjectId(String projectId) throws ApiException;
      void inviteUserToGroup(String email,String projectId,String groupId) throws KeyCloakAdminException, ApiException;
      void checkProjectByProjectId(String projectId);
      List<Member> getSubGroupMember(String projectId,String groupId);
      void moveGroupOfMember(String projectId,String groupId,String memberId);
-     Boolean joinNewProjectAndGroupForExistsUser(String token);
+     Boolean joinNewProjectAndGroupForExistsUser(String token, String email) throws ApiException;
 }

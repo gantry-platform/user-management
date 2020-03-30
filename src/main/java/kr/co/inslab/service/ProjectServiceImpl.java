@@ -167,6 +167,35 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
     }
 
     @Override
+    public void deleteMemberInPending(String email, String projectId) throws ApiException {
+
+        List<UserRepresentation> userRepresentations = this.getUserByEmail(email);
+
+        if(userRepresentations.size()==0){
+            throw new ApiException("["+email+"]"+"Not Found User", HttpStatus.NOT_FOUND);
+
+        }else if(userRepresentations.size()==1){
+            GroupRepresentation groupRepresentation = this.getGroupById(projectId);
+            this.removePendingUser(groupRepresentation,email);
+            try{
+                redisTemplate.delete(email);
+            }catch (Exception ex){
+                ex.printStackTrace();
+                logger.warn("Redis Key 삭제 중 Error");
+            }
+            if(!(userRepresentations.get(0).isEmailVerified())){
+                this.removeUser(userRepresentations.get(0).getId());
+            }
+        }else{
+            for(UserRepresentation userRepresentation: userRepresentations){
+                logger.debug(userRepresentation.getEmail());
+            }
+            logger.error("Multiple Users Exception");
+            throw new ApiException("Multiple Users Exception",HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
     public List<Group> getGroupsByProjectId(String projectId) throws ApiException {
         Project project = this.getProjectById(projectId);
         return project.getGroups();
@@ -194,15 +223,15 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
             String projectName = topGroup.getAttributes().get(StaticConfig.DISPLAY_NAME).get(0);
             String token = SimpleToken.generateNewToken();
 
-            Map<String,String> joinInfo = this.makeJoinInfo(projectId,groupId,userRepresentations.get(0).getId(),email);
+            Map<String,String> joinInfo = this.makeJoinInfo(projectId,groupId,userRepresentations.get(0).getId(),token);
 
             //Save to redis
             ValueOperations<String,Object> valueOperations = redisTemplate.opsForValue();
-            valueOperations.set(token,joinInfo);
+            valueOperations.set(email,joinInfo);
             redisTemplate.expire(token,24,TimeUnit.HOURS);
 
             //Send email
-            String inviteHtml = htmlTemplate.makeInviteHtml(StaticConfig.INVITE,token);
+            String inviteHtml = htmlTemplate.makeInviteHtml(StaticConfig.INVITE,token,email);
 
             mailSendingService.sendHtmlEmail(StaticConfig.NO_REPLY_GANTRY_AI,email,StaticConfig.GANTRY+"["+projectName+"]초대 메일",inviteHtml);
             this.addPendingUser(topGroup,email);
@@ -256,18 +285,21 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
 
     @Override
-    public Boolean joinNewProjectAndGroupForExistsUser(String token) {
+    public Boolean joinNewProjectAndGroupForExistsUser(String token, String email) throws ApiException {
 
         ValueOperations<String,Object> valueOperations = redisTemplate.opsForValue();
 
         @SuppressWarnings("unchecked")
-        HashMap<String,String> joinInfo = (HashMap<String, String>) valueOperations.get(token);
+        HashMap<String,String> joinInfo = (HashMap<String, String>) valueOperations.get(email);
 
         if(null != joinInfo){
             String groupId = joinInfo.get(StaticConfig.GROUP_ID);
             String projectId = joinInfo.get(StaticConfig.PROJECT_ID);
             String userId = joinInfo.get(StaticConfig.USER_ID);
-            String email = joinInfo.get(StaticConfig.EMAIL);
+            String savedToken = joinInfo.get(StaticConfig.TOKEN);
+            if(!savedToken.equals(email)){
+                throw new ApiException("Invalid Request",HttpStatus.BAD_REQUEST);
+            }
             GroupRepresentation groupRepresentation = this.getGroupById(projectId);
 
             this.joinGroup(userId,groupId);
@@ -280,12 +312,12 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
         return false;
     }
 
-    private Map<String,String> makeJoinInfo(String projectId,String groupId,String userId,String email){
+    private Map<String,String> makeJoinInfo(String projectId,String groupId,String userId,String token){
         Map<String,String> joinInfo = new HashMap<>();
         joinInfo.put(StaticConfig.PROJECT_ID,projectId);
         joinInfo.put(StaticConfig.GROUP_ID,groupId);
         joinInfo.put(StaticConfig.USER_ID,userId);
-        joinInfo.put(StaticConfig.EMAIL,email);
+        joinInfo.put(StaticConfig.TOKEN,token);
         return joinInfo;
     }
 

@@ -108,6 +108,19 @@ public interface ProjectsApi {
     ) throws Exception;
 
 
+    @ApiOperation(value = "특정 맴버를 invitation 리스트에서 삭제한다.", nickname = "projectsProjectIdGroupsInvitationDelete", notes = "", tags={ "projects", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class) })
+    @RequestMapping(value = "/projects/{project_id}/groups/invitation",
+            produces = { "application/json" },
+            method = RequestMethod.DELETE)
+    ResponseEntity<Void> projectsProjectIdGroupsInvitationDelete(@ApiParam(value = "project id",required=true) @PathVariable("project_id") String projectId
+            ,@NotNull @ApiParam(value = "", required = true) @Valid @RequestParam(value = "email", required = true) String email
+    ) throws Exception;
+
     @ApiOperation(value = "특정 프로젝트의 전체 맴버를 조회한다.", nickname = "projectsProjectIdGroupsGroupIdMembersGet", notes = "", response = Member.class, responseContainer = "List", tags={ "projects", })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success", response = Member.class, responseContainer = "List"),
@@ -151,6 +164,8 @@ public interface ProjectsApi {
     ) throws Exception;
 
 
+
+
     @ApiOperation(value = "프로젝트 업데이트 (owner and description)", nickname = "projectsProjectIdPatch", notes = "", tags={ "projects", })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
@@ -167,7 +182,7 @@ public interface ProjectsApi {
 
 
     @RequestMapping(value = "/projects/confirm-join",method = RequestMethod.GET)
-    public String confirmJoin(WebRequest request, @RequestParam("token") String token) throws Exception;
+    public String confirmJoin(WebRequest request, @RequestParam("token") String token,@RequestParam("email") String email) throws Exception;
 
 
 }

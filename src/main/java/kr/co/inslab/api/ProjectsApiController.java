@@ -50,9 +50,9 @@ public class ProjectsApiController implements ProjectsApi {
     }
 
     @Override
-    public String confirmJoin(WebRequest request,String token) {
+    public String confirmJoin(WebRequest request,String token, String email) throws ApiException {
 
-        Boolean success = projectService.joinNewProjectAndGroupForExistsUser(token);
+        Boolean success = projectService.joinNewProjectAndGroupForExistsUser(token, email);
 
         //TODO: gantry url 변경
 
@@ -65,7 +65,7 @@ public class ProjectsApiController implements ProjectsApi {
 
     @Override
     public ResponseEntity<Void> projectsProjectIdActivePut(String projectId) throws Exception {
-        ResponseEntity<Void> res = null;
+
 
         //임시코드
         String userId = this.getUserId(request);
@@ -76,9 +76,7 @@ public class ProjectsApiController implements ProjectsApi {
 
         projectService.updateProjectInfo(projectId,attrs);
 
-        res = new ResponseEntity<Void>(HttpStatus.OK);
-
-        return res;
+        return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
     @Override
@@ -88,16 +86,14 @@ public class ProjectsApiController implements ProjectsApi {
         String userId = this.getUserId(request);
 
         this.checkResource(userId,projectId);
-        ResponseEntity<Void> res = null;
+
         Map<String,String> attrs = new HashMap<String, String>();
 
         attrs.put(StaticConfig.STATUS,Project.StatusEnum.ARCHIVE.toString());
 
         projectService.updateProjectInfo(projectId,attrs);
 
-        res = new ResponseEntity<Void>(HttpStatus.OK);
-
-        return res;
+        return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
     @Override
@@ -105,8 +101,6 @@ public class ProjectsApiController implements ProjectsApi {
 
         //임시코드
         String userId = this.getUserId(request);
-
-        ResponseEntity<Void> res = null;
 
         this.checkResource(userId,projectId);
 
@@ -116,9 +110,7 @@ public class ProjectsApiController implements ProjectsApi {
 
         projectService.deleteProjectById(projectId);
 
-        res = new ResponseEntity<Void>(HttpStatus.OK);
-
-        return res;
+        return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
     @Override
@@ -127,7 +119,6 @@ public class ProjectsApiController implements ProjectsApi {
         //임시코드
         String userId = this.getUserId(request);
 
-        ResponseEntity<Project> res = null;
         this.checkResource(userId,projectId);
 
         Boolean existsUserInProject = projectService.existsUserInProject(userId,projectId);
@@ -137,8 +128,8 @@ public class ProjectsApiController implements ProjectsApi {
         }
 
         Project project = projectService.getProjectById(projectId);
-        res = new ResponseEntity<Project>(project,HttpStatus.OK);
-        return res;
+
+        return new ResponseEntity<Project>(project,HttpStatus.OK);
     }
 
     @Override
@@ -147,28 +138,31 @@ public class ProjectsApiController implements ProjectsApi {
         //임시코드
         String userId = this.getUserId(request);
 
-        ResponseEntity<List<Group>> res = null;
-
         this.checkResource(userId,projectId);
 
         List<Group> groups = projectService.getGroupsByProjectId(projectId);
 
-        res = new ResponseEntity<List<Group>>(groups,HttpStatus.OK);
-        return res;
+        return  new ResponseEntity<List<Group>>(groups,HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<Void> projectsProjectIdGroupsGroupIdInvitationPut(String projectId, String groupId, @NotNull @Valid String email) throws Exception {
-        ResponseEntity<Void> res = null;
 
         //임시코드
         String userId = this.getUserId(request);
 
         this.checkResource(userId,projectId);
         projectService.inviteUserToGroup(email,projectId,groupId);
-        res = new ResponseEntity<Void>(HttpStatus.OK);
 
-        return res;
+        return new ResponseEntity<Void>(HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Void> projectsProjectIdGroupsInvitationDelete(String projectId, @NotNull @Valid String email) throws Exception {
+
+        this.getUserId(request);
+        projectService.deleteMemberInPending(projectId,email);
+        return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
     @Override
@@ -177,12 +171,11 @@ public class ProjectsApiController implements ProjectsApi {
         //임시코드
         String userId = this.getUserId(request);
 
-
         ResponseEntity<List<Member>> res = null;
         this.checkResource(userId,projectId);
         List<Member> members = projectService.getSubGroupMember(projectId,groupId);
-        res = new ResponseEntity<List<Member>>(members,HttpStatus.OK);
-        return res;
+
+        return new ResponseEntity<List<Member>>(members,HttpStatus.OK);
     }
 
     @Override
@@ -191,7 +184,6 @@ public class ProjectsApiController implements ProjectsApi {
         //임시코드
         String userId = this.getUserId(request);
 
-        ResponseEntity<Void> res = null;
         this.checkResource(userId,projectId);
 
         if(!projectService.isAdminOfProject(userId,projectId)){
@@ -199,9 +191,8 @@ public class ProjectsApiController implements ProjectsApi {
         }
 
         projectService.moveGroupOfMember(projectId,groupId,memberId);
-        res = new ResponseEntity<Void>(HttpStatus.OK);
 
-        return res;
+        return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
     @Override
@@ -209,8 +200,6 @@ public class ProjectsApiController implements ProjectsApi {
 
         //임시코드
         String userId = this.getUserId(request);
-
-        ResponseEntity<Void> res = null;
 
         this.checkResource(userId,projectId);
 
@@ -220,10 +209,10 @@ public class ProjectsApiController implements ProjectsApi {
 
         projectService.deleteMemberInProject(projectId,memberId);
 
-        res = new ResponseEntity<Void>(HttpStatus.OK);
-
-        return res;
+        return new ResponseEntity<Void>(HttpStatus.OK);
     }
+
+
 
     @Override
     public ResponseEntity<Void> projectsProjectIdPatch(@Valid UpdateProject body,String projectId) throws Exception {
@@ -231,8 +220,6 @@ public class ProjectsApiController implements ProjectsApi {
         //임시코드
         String userId = this.getUserId(request);
 
-
-        ResponseEntity<Void> res = null;
         Map<String,String> attrs = null;
         String owner = body.getOwner();
         String description = body.getDescription();
@@ -255,9 +242,7 @@ public class ProjectsApiController implements ProjectsApi {
 
         projectService.updateProjectInfo(projectId,attrs);
 
-        res = new ResponseEntity<Void>(HttpStatus.OK);
-
-        return res;
+        return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
 

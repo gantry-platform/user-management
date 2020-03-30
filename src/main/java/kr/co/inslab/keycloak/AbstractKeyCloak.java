@@ -117,6 +117,9 @@ public abstract class AbstractKeyCloak {
         this.getRealm().groups().group(groupId).remove();
     }
 
+    protected void removeUser(String userId){
+        this.getRealm().users().get(userId).remove();
+    }
 
     protected String getCreatedId(Response response,String resourceName) throws KeyCloakAdminException {
         URI location = response.getLocation();
@@ -184,7 +187,7 @@ public abstract class AbstractKeyCloak {
         return groups;
     }
 
-    private final List<Member> getMembers(String groupId) {
+    private List<Member> getMembers(String groupId) {
         List<Member> members = null;
         List<UserRepresentation> gantryMembers = this.getMembersByGroupId(groupId);
         if (gantryMembers.size() > 0) {
@@ -202,7 +205,7 @@ public abstract class AbstractKeyCloak {
     }
 
 
-    private final List<PendingUser> makePendingUserFromEmailStatus(String groupId) {
+    private List<PendingUser> makePendingUserFromEmailStatus(String groupId) {
         List<PendingUser> pendingUsers = null;
         List<UserRepresentation> gantryMembers = this.getMembersByGroupId(groupId);
         if (gantryMembers.size() > 0) {
@@ -220,7 +223,7 @@ public abstract class AbstractKeyCloak {
 
 
 
-    private final void setAdditionalProperties(GroupRepresentation groupRepresentation,Project project,List<PendingUser> pendingUsers){
+    private void setAdditionalProperties(GroupRepresentation groupRepresentation, Project project, List<PendingUser> pendingUsers){
         Map<String, List<String>> groupAttrs = groupRepresentation.getAttributes();
 
         if (groupAttrs != null){
