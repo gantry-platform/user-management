@@ -35,6 +35,5 @@ public class MailSendingServiceImpl implements MailSendingService {
                 .withSource(from);
 
         amazonSimpleEmailServiceAsync.sendEmail(request);
-
     }
 }

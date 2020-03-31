@@ -25,18 +25,16 @@ import java.util.Map;
 @Component
 public abstract class AbstractKeyCloak {
 
-    private final Keycloak keycloakAdmin;
-
     @Value("${keycloak.targetRealm}")
     private String targetRealm;
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractKeyCloak.class);
+    private final Keycloak keycloakAdmin;
 
+    private static final Logger logger = LoggerFactory.getLogger(AbstractKeyCloak.class);
 
     public AbstractKeyCloak(Keycloak keycloakAdmin) {
         this.keycloakAdmin = keycloakAdmin;
     }
-
 
     protected List<UserRepresentation> getUserByEmail(String email){
         return this.getRealm().users().search(null,null,null,email,0,10);
@@ -51,9 +49,9 @@ public abstract class AbstractKeyCloak {
     }
 
     protected GroupRepresentation createGroup(String groupName, Map<String,String> groupAttr) throws KeyCloakAdminException {
-
         GroupRepresentation groupRepresentation = new GroupRepresentation();
         groupRepresentation.setName(groupName);
+
         if(groupAttr != null){
             for(String key: groupAttr.keySet()){
                 groupRepresentation.singleAttribute(key,groupAttr.get(key));
@@ -62,21 +60,19 @@ public abstract class AbstractKeyCloak {
 
         Response response = this.getRealm().groups().add(groupRepresentation);
         String createdId = getCreatedId(response,groupName);
-
-
         groupRepresentation.setId(createdId);
+
         return groupRepresentation;
     }
 
     protected GroupRepresentation addSubGroup(GroupRepresentation topGroup,String subGroupName) throws KeyCloakAdminException {
-
         GroupRepresentation groupRepresentation = new GroupRepresentation();
         groupRepresentation.setName(subGroupName);
 
         Response response = this.getRealm().groups().group(topGroup.getId()).subGroup(groupRepresentation);
         String createdId = getCreatedId(response,subGroupName);
-
         groupRepresentation.setId(createdId);
+
         return groupRepresentation;
     }
 

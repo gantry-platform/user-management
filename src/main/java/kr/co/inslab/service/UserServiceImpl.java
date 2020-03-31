@@ -36,16 +36,15 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
 
     @Override
     public Project createProject(String userId, String displayName, String description) throws KeyCloakAdminException, ApiException {
-
         String projectId = null;
+        GroupRepresentation projectGroupRep = null;
+
         String projectName = userId+"_"+displayName;
         String adminGroupName = SubGroup.ADMIN.toString();
         String opsGroupName = SubGroup.OPS.toString();
         String devGroupName = SubGroup.DEV.toString();
 
-        GroupRepresentation projectGroupRep = null;
         Map<String,String> groupAttr = new HashMap<>();
-
         groupAttr.put(StaticConfig.DISPLAY_NAME,displayName);
         groupAttr.put(StaticConfig.OWNER,userId);
         groupAttr.put(StaticConfig.STATUS,Project.StatusEnum.ACTIVE.toString());
@@ -53,6 +52,7 @@ public class UserServiceImpl extends AbstractKeyCloak implements UserService {
         if(!description.isEmpty()){
             groupAttr.put(StaticConfig.DESCRIPTION,description);
         }
+
         try{
             projectGroupRep = this.createGroup(projectName,groupAttr);
             projectId = projectGroupRep.getId();

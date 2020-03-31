@@ -51,7 +51,6 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
     public Boolean existsUserInProject(String userId, String projectId){
         boolean existsUserInProject = false;
         List<GroupRepresentation> groupRepresentations = this.getGroupsByUserId(userId);
-
         for(GroupRepresentation groupRepresentation : groupRepresentations){
             if(groupRepresentation.getId().equals(projectId)){
                 existsUserInProject = true;
@@ -78,7 +77,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
     @Override
     public Project getProjectById(String projectId) throws ApiException {
-        GroupRepresentation groupRepresentation ;
+        GroupRepresentation groupRepresentation;
         try{
             groupRepresentation = this.getGroupById(projectId);
         }catch (Exception e){
@@ -89,15 +88,12 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
             }
             throw e;
         }
-
         return makeProjectInfo(groupRepresentation);
     }
 
     @Override
     public void updateProjectInfo(String projectId, Map<String,String> attrs) throws ApiException {
-
-        GroupRepresentation groupRepresentation ;
-
+        GroupRepresentation groupRepresentation;
         try{
             groupRepresentation = this.getGroupById(projectId);
         }catch (Exception e){
@@ -108,15 +104,12 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
             }
             throw e;
         }
-
         if(null != attrs){
             for(String key:attrs.keySet()){
                 groupRepresentation.singleAttribute(key,attrs.get(key));
             }
         }
-
         this.updateGroup(groupRepresentation.getId(),groupRepresentation);
-
     }
 
     @Override
@@ -133,6 +126,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
     @Override
     public Boolean isAdminOfProject(String userId, String projectId) {
         boolean isAdmin = false;
+
         GroupRepresentation groupRepresentation = this.getGroupById(projectId);
         List<GroupRepresentation> subGroups = groupRepresentation.getSubGroups();
 
@@ -153,7 +147,6 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
     @Override
     public void deleteProjectById(String projectId) {
-
         this.removeGroupById(projectId);
     }
 
@@ -168,12 +161,11 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
     @Override
     public void deleteMemberInPending(String projectId,String email) throws ApiException {
-
         List<UserRepresentation> userRepresentations = this.getUserByEmail(email);
-
+        //Not Found User
         if(userRepresentations.size()==0){
             throw new ApiException("["+email+"]"+"Not Found User", HttpStatus.NOT_FOUND);
-
+        //Exists User
         }else if(userRepresentations.size()==1){
             GroupRepresentation groupRepresentation = this.getGroupById(projectId);
             this.removePendingUser(groupRepresentation,email);
@@ -186,6 +178,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
             if(!(userRepresentations.get(0).isEmailVerified())){
                 this.removeUser(userRepresentations.get(0).getId());
             }
+        //Multiple Users
         }else{
             for(UserRepresentation userRepresentation: userRepresentations){
                 logger.debug(userRepresentation.getEmail());
@@ -203,11 +196,9 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
     @Override
     public void inviteUserToGroup(String email,String projectId,String groupId) throws KeyCloakAdminException, ApiException {
-
         List<UserRepresentation> userRepresentations = this.getUserByEmail(email);
-
         //New User
-        if((null == userRepresentations) || (userRepresentations.size() == 0)){
+        if((userRepresentations == null) || (userRepresentations.size() == 0)){
             //TODO: 생성 error 처리 추가해야 함
             GroupRepresentation topGroup = this.getGroupById(projectId);
             GroupRepresentation subGroup = this.getGroupById(groupId);
@@ -218,11 +209,10 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
             userResource.sendVerifyEmail();
         //Exists User
         }else if(userRepresentations.size()==1){
-
+            //Make Join Info
             GroupRepresentation topGroup = this.getGroupById(projectId);
             String projectName = topGroup.getAttributes().get(StaticConfig.DISPLAY_NAME).get(0);
             String token = SimpleToken.generateNewToken();
-
             Map<String,String> joinInfo = this.makeJoinInfo(projectId,groupId,userRepresentations.get(0).getId(),token);
 
             //Save to redis
@@ -232,10 +222,8 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
             //Send email
             String inviteHtml = htmlTemplate.makeInviteHtml(StaticConfig.INVITE,token,email);
-
-            mailSendingService.sendHtmlEmail(StaticConfig.NO_REPLY_GANTRY_AI,email,StaticConfig.GANTRY+"["+projectName+"]초대 메일",inviteHtml);
+            mailSendingService.sendHtmlEmail(StaticConfig.NO_REPLY_GANTRY_AI,email,StaticConfig.GANTRY+ " Project 초대 메일",inviteHtml);
             this.addPendingUser(topGroup,email);
-
         //Multiple Users
         }else{
             for(UserRepresentation userRepresentation: userRepresentations){
@@ -253,12 +241,15 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
     @Override
     public List<Member> getSubGroupMember(String projectId,String groupId) {
-        List<Member> members = new ArrayList<>();
+        List<Member> members = null;
 
         GroupRepresentation groupRepresentation = this.getGroupById(groupId);
         List<UserRepresentation> userRepresentations = this.getMembersByGroupId(groupRepresentation.getId());
 
         for(UserRepresentation user : userRepresentations){
+            if(members == null){
+                members = new ArrayList<>();
+            }
             Member member = new Member();
             member.setUserName(user.getUsername());
             member.setEmailVerified(user.isEmailVerified());
@@ -271,45 +262,41 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
     @Override
     public void moveGroupOfMember(String projectId, String groupId, String memberId) {
-
         List<GroupRepresentation> groupRepresentations = this.getGroupsByUserId(memberId);
-
         for(GroupRepresentation groupRepresentation : groupRepresentations){
             if(!groupRepresentation.getId().equals(projectId)){
                 this.leaveGroup(memberId,groupRepresentation.getId());
             }
         }
-
         this.joinGroup(memberId,groupId);
     }
 
 
     @Override
     public Boolean joinNewProjectAndGroupForExistsUser(String token, String email) throws ApiException {
-
         ValueOperations<String,Object> valueOperations = redisTemplate.opsForValue();
-
         @SuppressWarnings("unchecked")
         HashMap<String,String> joinInfo = (HashMap<String, String>) valueOperations.get(email);
 
-        if(null != joinInfo){
+        if(joinInfo != null){
             String groupId = joinInfo.get(StaticConfig.GROUP_ID);
             String projectId = joinInfo.get(StaticConfig.PROJECT_ID);
             String userId = joinInfo.get(StaticConfig.USER_ID);
             String savedToken = joinInfo.get(StaticConfig.TOKEN);
-            logger.debug(savedToken);
+
             if(!(savedToken.equals(token))){
                 throw new ApiException("Invalid Request",HttpStatus.BAD_REQUEST);
             }
-            GroupRepresentation groupRepresentation = this.getGroupById(projectId);
 
-            this.joinGroup(userId,groupId);
+            GroupRepresentation groupRepresentation = this.getGroupById(projectId);
             this.joinGroup(userId,projectId);
+            this.joinGroup(userId,groupId);
+
+
             this.removePendingUser(groupRepresentation,email);
 
            return true;
         }
-
         return false;
     }
 
@@ -323,13 +310,10 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
     }
 
     private void addPendingUser(GroupRepresentation groupRepresentation, String email){
-        Map<String, List<String>> projectAttrs;
-        List<String> pendingUsers;
+        Map<String, List<String>> projectAttrs = groupRepresentation.getAttributes();
+        List<String> pendingUsers = projectAttrs.get(StaticConfig.PENDING);
 
-        projectAttrs = groupRepresentation.getAttributes();
-        pendingUsers = projectAttrs.get(StaticConfig.PENDING);
-
-        if(null == pendingUsers){
+        if(pendingUsers == null){
             pendingUsers = new ArrayList<>();
         }
 
@@ -343,11 +327,8 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
     }
 
     public void removePendingUser(GroupRepresentation groupRepresentation,String email) {
-        Map<String, List<String>> projectAttrs ;
-        List<String> pendingUsers ;
-
-        projectAttrs = groupRepresentation.getAttributes();
-        pendingUsers = projectAttrs.get(StaticConfig.PENDING);
+        Map<String, List<String>> projectAttrs = groupRepresentation.getAttributes();
+        List<String> pendingUsers = projectAttrs.get(StaticConfig.PENDING);
 
         if(pendingUsers !=null && pendingUsers.contains(email)){
             pendingUsers.remove(email);
