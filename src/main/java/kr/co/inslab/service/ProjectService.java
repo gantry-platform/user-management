@@ -18,7 +18,7 @@ public interface ProjectService {
      Boolean isAdminOfProject(String userId,String projectId);
      void deleteProjectById(String projectId);
      void deleteMemberInProject(String projectId,String memberId);
-     void deleteMemberInPending(String email,String projectId) throws ApiException;
+     void deleteMemberInPending(String projectId,String email) throws ApiException;
      List<Group> getGroupsByProjectId(String projectId) throws ApiException;
      void inviteUserToGroup(String email,String projectId,String groupId) throws KeyCloakAdminException, ApiException;
      void checkProjectByProjectId(String projectId);

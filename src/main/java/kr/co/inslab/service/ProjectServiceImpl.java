@@ -167,7 +167,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
     }
 
     @Override
-    public void deleteMemberInPending(String email, String projectId) throws ApiException {
+    public void deleteMemberInPending(String projectId,String email) throws ApiException {
 
         List<UserRepresentation> userRepresentations = this.getUserByEmail(email);
 
@@ -297,7 +297,8 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
             String projectId = joinInfo.get(StaticConfig.PROJECT_ID);
             String userId = joinInfo.get(StaticConfig.USER_ID);
             String savedToken = joinInfo.get(StaticConfig.TOKEN);
-            if(!savedToken.equals(email)){
+            logger.debug(savedToken);
+            if(!(savedToken.equals(token))){
                 throw new ApiException("Invalid Request",HttpStatus.BAD_REQUEST);
             }
             GroupRepresentation groupRepresentation = this.getGroupById(projectId);

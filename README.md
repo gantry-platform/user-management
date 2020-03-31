@@ -22,11 +22,9 @@ TODO
 
 2.Exception 정리
 
-3.Pending 삭제 기능 추가
+3.초대 메일 클릭 시 처리할 HTML 파일 템플릿 추가
 
-4.초대 메일 클릭 시 처리할 HTML 파일 템플릿 추가
-
-5.Api Gateway 추가 시 임시코드 삭제
+4.Api Gateway 추가 시 임시코드 삭제
 
 
 
