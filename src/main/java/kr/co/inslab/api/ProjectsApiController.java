@@ -51,16 +51,18 @@ public class ProjectsApiController implements ProjectsApi {
 
     @Override
     public String confirmJoin(WebRequest request,String token, String email) throws ApiException {
-
-        Boolean success = projectService.joinNewProjectAndGroupForExistsUser(token, email);
-
-        //TODO: gantry url 변경
-
-        if(success == false){
-            return "redirect:http://127.0.0.1:80";
+        boolean success = false;
+        try{
+            success = projectService.joinNewProjectAndGroupForExistsUser(token, email);
+        }catch (Exception ex){
+            logger.error(ex.toString());
+            success = false;
         }
 
-        return "redirect:http://127.0.0.1:8080";
+        if(success == false){
+            return "intive-failure";
+        }
+        return "invite-success";
     }
 
     @Override
