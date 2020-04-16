@@ -75,7 +75,7 @@ public class UsersApiController implements UsersApi {
     }
 
     //임시코드
-    private final String getUserId(HttpServletRequest request) throws VerificationException {
+    private final String getUserId(HttpServletRequest request) throws Exception {
         String userId = null;
         String token = request.getHeader("Authorization");
         if (token != null && !token.isEmpty()) {
@@ -84,6 +84,9 @@ public class UsersApiController implements UsersApi {
             AccessToken accessToken = TokenVerifier.create(splitToken[1], AccessToken.class).getToken();
             userId = accessToken.getSubject();
             logger.debug("subject:"+userId);
+        }
+        if(userId==null){
+            throw new ApiException("Invaild userId", HttpStatus.BAD_REQUEST);
         }
         return userId;
     }

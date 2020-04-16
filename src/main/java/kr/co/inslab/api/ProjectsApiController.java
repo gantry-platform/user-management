@@ -257,7 +257,9 @@ public class ProjectsApiController implements ProjectsApi {
             AccessToken accessToken = TokenVerifier.create(splitToken[1], AccessToken.class).getToken();
             userId = accessToken.getSubject();
             logger.debug("subject:"+userId);
-
+        }
+        if(userId==null){
+            throw new ApiException("Invaild userId", HttpStatus.BAD_REQUEST);
         }
         return userId;
     }

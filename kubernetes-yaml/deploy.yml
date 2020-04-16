@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: user
-  namespace: gantry-user-management
+  namespace: user-management
   labels:
     app: user
 spec:
@@ -15,12 +15,15 @@ spec:
       labels:
         app: user
     spec:
-      serviceAccountName: user-management-account
       containers:
         - name: user
-          image: harbor.dev.gantry.ai/gantry/user-management:0.19
+          image: harbor.gantry.ai/gantry/user-management:0.1
           ports:
           - containerPort: 8080
-          args: ["--spring.profiles.active=dev"]
+          args: ["--spring.profiles.active=prod"]
+        - name: redis
+          image: redis:latest
+          ports:
+            - containerPort: 6379
       imagePullSecrets:
-        - name: harbor-secret
+        - name: harbor
