@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: user
-  namespace: user-management
+  namespace: gantry
   labels:
     app: user
 spec:
@@ -26,4 +26,4 @@ spec:
           ports:
             - containerPort: 6379
       imagePullSecrets:
-        - name: harbor
+        - name: harbor-cred
