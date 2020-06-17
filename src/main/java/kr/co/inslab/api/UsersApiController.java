@@ -1,25 +1,23 @@
 package kr.co.inslab.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.ApiParam;
-import kr.co.inslab.exception.APIException;
-import kr.co.inslab.keycloak.KeyCloakStaticConfig;
-import kr.co.inslab.model.UserInvitation;
+import kr.co.inslab.exception.ApiException;
+import kr.co.inslab.exception.KeyCloakAdminException;
+import kr.co.inslab.model.NewProject;
+import kr.co.inslab.model.Project;
+import kr.co.inslab.model.User;
 import kr.co.inslab.service.UserService;
-import org.keycloak.admin.client.resource.UserResource;
-import org.keycloak.representations.idm.UserRepresentation;
+import org.keycloak.TokenVerifier;
+import org.keycloak.common.VerificationException;
+import org.keycloak.representations.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-02-26T15:17:27.527+09:00[Asia/Seoul]")
 @Controller
@@ -41,59 +39,55 @@ public class UsersApiController implements UsersApi {
     }
 
 
-    public ResponseEntity<String> usersInvitationPost(@ApiParam(value = "" ,required=true )  @Valid @RequestBody UserInvitation body) throws Exception {
+    @Override
+    public ResponseEntity<User> usersGet(@Valid Boolean includeProject) throws Exception {
 
-        String email = body.getEamil();
+        //임시코드
+        String userId = this.getUserId(request);
 
-        List<UserRepresentation> userRepresentations = this.userService.getUserByEmail(email);
+        userService.checkUserById(userId);
 
-        if(userRepresentations.size()!=0){
-            throw new APIException(email,HttpStatus.CONFLICT);
+        if(includeProject==null){
+            includeProject=false;
         }
 
-        UserRepresentation userRepresentation = new UserRepresentation();
-        userRepresentation.setEnabled(true);
-        userRepresentation.setEmailVerified(true);
-        userRepresentation.setEmail(email);
-        userRepresentation.setUsername(email);
 
-        List<String> actions = new ArrayList<String>();
-        actions.add(KeyCloakStaticConfig.UPDATE_PROFILE);
-        actions.add(KeyCloakStaticConfig.UPDATE_PASSWORD);
-        actions.add(KeyCloakStaticConfig.VERIFY_EMAIL);
-        userRepresentation.setRequiredActions(actions);
+        User user = userService.getUserInfoById(userId,includeProject);
+        ResponseEntity<User> res = new ResponseEntity<User>(user,HttpStatus.OK);
 
-
-        this.userService.inviteUser(userRepresentation);
-
-        List<UserRepresentation> invitedUser = this.userService.getUserByEmail(email);
-        if (invitedUser.size() == 0){
-            throw new APIException(email,HttpStatus.NOT_FOUND);
-        }else if(invitedUser.size() > 1){
-            throw new APIException(email,HttpStatus.CONFLICT);
-        }
-
-        //send email
-        UserResource resource= this.userService.getUserResourceById(invitedUser.get(0).getId());
-        resource.sendVerifyEmail();
-
-        return new ResponseEntity<String>("Created",HttpStatus.CREATED);
+        return res;
     }
 
-    public ResponseEntity<String> usersIdDelete(@ApiParam(value = "",required=true) @PathVariable("id") String id) throws Exception{
+    @Override
+    public ResponseEntity<Project> usersProjectsPost(NewProject body) throws Exception {
+        //임시코드
+        String userId = this.getUserId(request);
+        userService.checkUserById(userId);
 
-        UserResource userResource = this.userService.getUserResourceById(id);
+        String displayName = body.getDisplayName();
+        String description = body.getDescription();
 
-        try {
-            //TODO: javax.ws.rs 상위 예외 처리로 변경 필요
-            UserRepresentation userRepresentation = userResource.toRepresentation();
-        }catch (javax.ws.rs.NotFoundException e){
-            throw new APIException(id,HttpStatus.NOT_FOUND);
-        }
+        Project project = userService.createProject(userId,displayName,description);
 
-        this.userService.getUserResourceById(id).remove();
+        ResponseEntity<Project> res = new ResponseEntity<Project>(project,HttpStatus.OK);
 
-        return new ResponseEntity<String>("Success",HttpStatus.OK);
+        return res;
     }
 
+    //임시코드
+    private final String getUserId(HttpServletRequest request) throws Exception {
+        String userId = null;
+        String token = request.getHeader("Authorization");
+        if (token != null && !token.isEmpty()) {
+            String[] splitToken = token.split(" ");
+            System.out.println(splitToken[1]);
+            AccessToken accessToken = TokenVerifier.create(splitToken[1], AccessToken.class).getToken();
+            userId = accessToken.getSubject();
+            logger.debug("subject:"+userId);
+        }
+        if(userId==null){
+            throw new ApiException("Invaild userId", HttpStatus.BAD_REQUEST);
+        }
+        return userId;
+    }
 }

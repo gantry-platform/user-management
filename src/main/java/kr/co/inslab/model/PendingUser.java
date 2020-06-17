@@ -10,32 +10,31 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * UserInvitation
+ * PendingUser
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-02-26T15:17:27.527+09:00[Asia/Seoul]")
-public class UserInvitation   {
-  @JsonProperty("eamil")
-  private String eamil = null;
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-03-20T09:52:19.240+09:00[Asia/Seoul]")
+public class PendingUser   {
+  @JsonProperty("email")
+  private String email = null;
 
-  public UserInvitation eamil(String eamil) {
-    this.eamil = eamil;
+  public PendingUser email(String email) {
+    this.email = email;
     return this;
   }
 
   /**
-   * Get eamil
-   * @return eamil
+   * Get email
+   * @return email
   **/
-  @ApiModelProperty(required = true, value = "")
-      @NotNull
-
-    public String getEamil() {
-    return eamil;
+  @ApiModelProperty(value = "")
+  
+    public String getEmail() {
+    return email;
   }
 
-  public void setEamil(String eamil) {
-    this.eamil = eamil;
+  public void setEmail(String email) {
+    this.email = email;
   }
 
 
@@ -47,21 +46,21 @@ public class UserInvitation   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    UserInvitation userInvitation = (UserInvitation) o;
-    return Objects.equals(this.eamil, userInvitation.eamil);
+    PendingUser pendingUser = (PendingUser) o;
+    return Objects.equals(this.email, pendingUser.email);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(eamil);
+    return Objects.hash(email);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class UserInvitation {\n");
+    sb.append("class PendingUser {\n");
     
-    sb.append("    eamil: ").append(toIndentedString(eamil)).append("\n");
+    sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("}");
     return sb.toString();
   }

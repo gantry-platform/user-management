@@ -5,10 +5,10 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/rewrite-target: /
   name: user
-  namespace: gantry-user-management
+  namespace: user-management
 spec:
   rules:
-    - host: gantryuser.mgmt.dev.gantry.ai
+    - host: user.gantry.ai
       http:
         paths:
           - backend:
@@ -17,5 +17,5 @@ spec:
             path: /
   tls:
     - hosts:
-        - gantryuser.mgmt.dev.gantry.ai
+        - user.gantry.ai
       secretName: user-ingress-tls

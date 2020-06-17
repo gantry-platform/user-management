@@ -1,12 +1,12 @@
 package kr.co.inslab.service;
 
-import org.keycloak.admin.client.resource.UserResource;
-import org.keycloak.representations.idm.UserRepresentation;
-
-import java.util.List;
+import kr.co.inslab.exception.ApiException;
+import kr.co.inslab.exception.KeyCloakAdminException;
+import kr.co.inslab.model.Project;
+import kr.co.inslab.model.User;
 
 public interface UserService {
-    public List<UserRepresentation> getUserByEmail(String email) throws Exception;
-    public UserResource getUserResourceById(String id) throws Exception;
-    public void inviteUser(UserRepresentation userRepresentation) throws Exception;
+    User getUserInfoById(String userId,Boolean includeProject);
+    Project createProject(String userId, String displayName, String description) throws KeyCloakAdminException, ApiException;
+    void checkUserById(String userId) throws ApiException;
 }

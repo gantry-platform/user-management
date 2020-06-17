@@ -35,6 +35,6 @@ public class CustomResponseBodyAdviceAdapter implements ResponseBodyAdvice<Objec
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-        return false;
+        return true;
     }
 }

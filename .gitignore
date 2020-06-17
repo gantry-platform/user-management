@@ -3,7 +3,9 @@
 .swagger-codegen/
 target/
 bin/
+.codegen/
 .classpath
 .project
 .swagger-codegen-ignore
 *.iml
+.factorypath
