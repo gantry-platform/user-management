@@ -1,4 +1,4 @@
-package kr.co.inslab.service;
+package kr.co.inslab.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,9 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class LoggingServiceImpl implements LoggingService {
+public class DefaultHttpLoggingService implements HttpLogging {
 
-    private final Logger logger = LoggerFactory.getLogger(LoggingServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(DefaultHttpLoggingService.class);
 
     @Override
     public void logRequest(HttpServletRequest request, Object body) {

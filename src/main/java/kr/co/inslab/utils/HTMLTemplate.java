@@ -1,12 +1,15 @@
-package kr.co.inslab.util;
+package kr.co.inslab.utils;
 
-import kr.co.inslab.bootstrap.StaticConfig;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 @Component
 public class HTMLTemplate {
+
+    @Value("${mail.inviteUrl}")
+    private String mailInviteUrl;
 
     private final SpringTemplateEngine templateEngine;
 
@@ -16,8 +19,9 @@ public class HTMLTemplate {
 
     public String makeInviteHtml(String htmlName,String token,String email){
         Context context = new Context();
-        context.setVariable(StaticConfig.TOKEN, token);
-        context.setVariable(StaticConfig.EMAIL, email);
+        context.setVariable(CommonConstants.MAIL_INVITE_URL,mailInviteUrl);
+        context.setVariable(CommonConstants.TOKEN, token);
+        context.setVariable(CommonConstants.EMAIL, email);
         return templateEngine.process(htmlName, context);
     }
 

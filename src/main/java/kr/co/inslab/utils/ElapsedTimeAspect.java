@@ -1,4 +1,4 @@
-package kr.co.inslab.aop;
+package kr.co.inslab.utils;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

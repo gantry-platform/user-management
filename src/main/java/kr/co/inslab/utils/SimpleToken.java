@@ -1,4 +1,4 @@
-package kr.co.inslab.util;
+package kr.co.inslab.utils;
 
 import java.security.SecureRandom;
 import java.util.Base64;

@@ -1,12 +1,12 @@
-package kr.co.inslab.exception;
+package kr.co.inslab.gantry;
 
 import org.springframework.http.HttpStatus;
 
-public class KeyCloakAdminException extends Exception{
+public class UserException extends Exception{
 
     private final HttpStatus httpStatus;
 
-    public KeyCloakAdminException(String message, HttpStatus httpStatus) {
+    public UserException(String message, HttpStatus httpStatus) {
         super(message);
         this.httpStatus = httpStatus;
     }

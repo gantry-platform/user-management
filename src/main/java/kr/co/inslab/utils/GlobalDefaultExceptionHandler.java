@@ -1,6 +1,8 @@
-package kr.co.inslab.exception;
+package kr.co.inslab.utils;
 
 
+import kr.co.inslab.api.ApiException;
+import kr.co.inslab.keycloak.KeyCloakAdminException;
 import kr.co.inslab.model.Error;
 import org.keycloak.common.VerificationException;
 import org.slf4j.Logger;

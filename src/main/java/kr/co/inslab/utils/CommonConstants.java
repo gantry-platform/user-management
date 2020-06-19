@@ -1,10 +1,10 @@
-package kr.co.inslab.bootstrap;
+package kr.co.inslab.utils;
 
 
 import org.springframework.beans.factory.annotation.Value;
 
 
-public class StaticConfig {
+public class CommonConstants {
     public final static String UPDATE_PROFILE = "UPDATE_PROFILE";
     public final static String VERIFY_EMAIL = "VERIFY_EMAIL";
     public final static String UPDATE_PASSWORD = "UPDATE_PASSWORD";
@@ -21,4 +21,5 @@ public class StaticConfig {
     public final static String EMAIL = "email";
     public final static String INVITE = "invite";
     public final static String NO_REPLY_GANTRY_AI = "noreply@gantry.ai";
+    public final static String MAIL_INVITE_URL = "mailInviteUrl";
 }

@@ -1,4 +1,4 @@
-package kr.co.inslab.service;
+package kr.co.inslab.utils;
 
 
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceAsync;
@@ -9,13 +9,13 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class MailSendingServiceImpl implements MailSendingService {
+public class SesMailSendingService implements MailSending {
 
-    private final Logger logger = LoggerFactory.getLogger(MailSendingServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(SesMailSendingService.class);
 
     private final AmazonSimpleEmailServiceAsync amazonSimpleEmailServiceAsync;
 
-    public MailSendingServiceImpl(AmazonSimpleEmailServiceAsync amazonSimpleEmailServiceAsync) {
+    public SesMailSendingService(AmazonSimpleEmailServiceAsync amazonSimpleEmailServiceAsync) {
         this.amazonSimpleEmailServiceAsync = amazonSimpleEmailServiceAsync;
     }
 

@@ -1,14 +1,12 @@
 package kr.co.inslab.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.inslab.exception.ApiException;
-import kr.co.inslab.exception.KeyCloakAdminException;
 import kr.co.inslab.model.NewProject;
 import kr.co.inslab.model.Project;
 import kr.co.inslab.model.User;
-import kr.co.inslab.service.UserService;
+import kr.co.inslab.gantry.GantryProject;
+import kr.co.inslab.gantry.GantryUser;
 import org.keycloak.TokenVerifier;
-import org.keycloak.common.VerificationException;
 import org.keycloak.representations.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,13 +27,16 @@ public class UsersApiController implements UsersApi {
 
     private final HttpServletRequest request;
 
-    private final UserService userService;
+    private final GantryUser gantryUser;
+
+    private final GantryProject gantryProject;
 
     @org.springframework.beans.factory.annotation.Autowired
-    public UsersApiController(ObjectMapper objectMapper, HttpServletRequest request, UserService userService) {
+    public UsersApiController(ObjectMapper objectMapper, HttpServletRequest request, GantryUser gantryUser, GantryProject gantryProject) {
         this.objectMapper = objectMapper;
         this.request = request;
-        this.userService = userService;
+        this.gantryUser = gantryUser;
+        this.gantryProject = gantryProject;
     }
 
 
@@ -45,31 +46,31 @@ public class UsersApiController implements UsersApi {
         //임시코드
         String userId = this.getUserId(request);
 
-        userService.checkUserById(userId);
+        gantryUser.checkUserById(userId);
 
         if(includeProject==null){
             includeProject=false;
         }
 
 
-        User user = userService.getUserInfoById(userId,includeProject);
+        User user = gantryUser.getUserInfoById(userId,includeProject);
         ResponseEntity<User> res = new ResponseEntity<User>(user,HttpStatus.OK);
 
         return res;
     }
 
     @Override
-    public ResponseEntity<Project> usersProjectsPost(NewProject body) throws Exception {
+    public ResponseEntity<kr.co.inslab.model.Project> usersProjectsPost(NewProject body) throws Exception {
         //임시코드
         String userId = this.getUserId(request);
-        userService.checkUserById(userId);
+        gantryUser.checkUserById(userId);
 
         String displayName = body.getDisplayName();
         String description = body.getDescription();
 
-        Project project = userService.createProject(userId,displayName,description);
+       Project project = gantryProject.createProject(userId,displayName,description);
 
-        ResponseEntity<Project> res = new ResponseEntity<Project>(project,HttpStatus.OK);
+        ResponseEntity<kr.co.inslab.model.Project> res = new ResponseEntity<kr.co.inslab.model.Project>(project,HttpStatus.OK);
 
         return res;
     }

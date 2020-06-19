@@ -1,17 +1,18 @@
 package kr.co.inslab.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.inslab.exception.ApiException;
-import kr.co.inslab.bootstrap.StaticConfig;
+import kr.co.inslab.utils.CommonConstants;
+import kr.co.inslab.gantry.GantryProject;
+import kr.co.inslab.gantry.GantryUser;
 import kr.co.inslab.model.Group;
 import kr.co.inslab.model.Member;
 import kr.co.inslab.model.Project;
 import kr.co.inslab.model.UpdateProject;
-import kr.co.inslab.service.ProjectService;
 import org.keycloak.TokenVerifier;
 import org.keycloak.representations.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -34,26 +35,32 @@ public class ProjectsApiController implements ProjectsApi {
 
     private final HttpServletRequest request;
 
-    private final ProjectService projectService;
+    private final GantryProject gantryProject;
+
+    private final GantryUser gantryUser;
+
+    @Value("${dashboard.url}")
+    private String dashboardUrl;
 
     @org.springframework.beans.factory.annotation.Autowired
-    public ProjectsApiController(ObjectMapper objectMapper, HttpServletRequest request, ProjectService projectService) {
+    public ProjectsApiController(ObjectMapper objectMapper, HttpServletRequest request, GantryProject gantryProject, GantryUser gantryUser) {
         this.objectMapper = objectMapper;
         this.request = request;
-        this.projectService = projectService;
+        this.gantryProject = gantryProject;
+        this.gantryUser = gantryUser;
     }
 
     //TODO: interceptor나 adviser로변경
-    private void checkResource(String userId,String projectId) throws ApiException {
-        projectService.checkUserById(userId);
-        projectService.checkProjectByProjectId(projectId);
+    private void checkResource(String userId,String projectId) throws Exception {
+        gantryUser.checkUserById(userId);
+        gantryProject.checkProjectByProjectId(projectId);
     }
 
     @Override
-    public String confirmJoin(WebRequest request,String token, String email) throws ApiException {
+    public String confirmJoin(WebRequest request,String token, String email) throws Exception {
         boolean success = false;
         try{
-            success = projectService.joinNewProjectAndGroupForExistsUser(token, email);
+            success = gantryProject.joinNewProjectAndGroupForExistsUser(token, email);
         }catch (Exception ex){
             logger.error(ex.toString());
             success = false;
@@ -62,21 +69,20 @@ public class ProjectsApiController implements ProjectsApi {
         if(success == false){
             return "intive-failure";
         }
-        return "invite-success";
+        return "redirect:"+dashboardUrl;
     }
 
     @Override
     public ResponseEntity<Void> projectsProjectIdActivePut(String projectId) throws Exception {
-
 
         //임시코드
         String userId = this.getUserId(request);
         this.checkResource(userId,projectId);
 
         Map<String,String> attrs = new HashMap<String, String>();
-        attrs.put(StaticConfig.STATUS,Project.StatusEnum.ACTIVE.toString());
+        attrs.put(CommonConstants.STATUS, kr.co.inslab.model.Project.StatusEnum.ACTIVE.toString());
 
-        projectService.updateProjectInfo(projectId,attrs);
+        gantryProject.updateProjectInfo(projectId,attrs);
 
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
@@ -91,9 +97,9 @@ public class ProjectsApiController implements ProjectsApi {
 
         Map<String,String> attrs = new HashMap<String, String>();
 
-        attrs.put(StaticConfig.STATUS,Project.StatusEnum.ARCHIVE.toString());
+        attrs.put(CommonConstants.STATUS, kr.co.inslab.model.Project.StatusEnum.ARCHIVE.toString());
 
-        projectService.updateProjectInfo(projectId,attrs);
+        gantryProject.updateProjectInfo(projectId,attrs);
 
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
@@ -106,11 +112,11 @@ public class ProjectsApiController implements ProjectsApi {
 
         this.checkResource(userId,projectId);
 
-        if(!projectService.isOwnerOfProject(userId,projectId)){
+        if(!gantryProject.isOwnerOfProject(userId,projectId)){
             throw new ApiException(userId+"is not the owner of project",HttpStatus.BAD_REQUEST);
         }
 
-        projectService.deleteProjectById(projectId);
+        gantryProject.deleteProjectById(projectId);
 
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
@@ -123,15 +129,15 @@ public class ProjectsApiController implements ProjectsApi {
 
         this.checkResource(userId,projectId);
 
-        Boolean existsUserInProject = projectService.existsUserInProject(userId,projectId);
+        Boolean existsUserInProject = gantryProject.existsUserInProject(userId,projectId);
 
         if(!existsUserInProject){
             throw new ApiException("Does Not Exists User In Project",HttpStatus.BAD_REQUEST);
         }
 
-        Project project = projectService.getProjectById(projectId);
+        Project project = gantryProject.getProjectById(projectId);
 
-        return new ResponseEntity<Project>(project,HttpStatus.OK);
+        return new ResponseEntity<kr.co.inslab.model.Project>(project,HttpStatus.OK);
     }
 
     @Override
@@ -142,7 +148,7 @@ public class ProjectsApiController implements ProjectsApi {
 
         this.checkResource(userId,projectId);
 
-        List<Group> groups = projectService.getGroupsByProjectId(projectId);
+        List<Group> groups = gantryProject.getGroupsByProjectId(projectId);
 
         return  new ResponseEntity<List<Group>>(groups,HttpStatus.OK);
     }
@@ -154,7 +160,7 @@ public class ProjectsApiController implements ProjectsApi {
         String userId = this.getUserId(request);
 
         this.checkResource(userId,projectId);
-        projectService.inviteUserToGroup(email,projectId,groupId);
+        gantryProject.inviteUserToGroup(email,projectId,groupId);
 
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
@@ -163,7 +169,7 @@ public class ProjectsApiController implements ProjectsApi {
     public ResponseEntity<Void> projectsProjectIdGroupsInvitationDelete(String projectId, @NotNull @Valid String email) throws Exception {
 
         this.getUserId(request);
-        projectService.deleteMemberInPending(projectId,email);
+        gantryProject.deleteMemberInPending(projectId,email);
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
@@ -175,7 +181,7 @@ public class ProjectsApiController implements ProjectsApi {
 
         ResponseEntity<List<Member>> res = null;
         this.checkResource(userId,projectId);
-        List<Member> members = projectService.getSubGroupMember(projectId,groupId);
+        List<Member> members = gantryProject.getSubGroupMember(projectId,groupId);
 
         return new ResponseEntity<List<Member>>(members,HttpStatus.OK);
     }
@@ -188,11 +194,11 @@ public class ProjectsApiController implements ProjectsApi {
 
         this.checkResource(userId,projectId);
 
-        if(!projectService.isAdminOfProject(userId,projectId)){
+        if(!gantryProject.isAdminOfProject(userId,projectId)){
             throw new ApiException(userId+"is not the admin of the project",HttpStatus.BAD_REQUEST);
         }
 
-        projectService.moveGroupOfMember(projectId,groupId,memberId);
+        gantryProject.moveGroupOfMember(projectId,groupId,memberId);
 
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
@@ -205,11 +211,11 @@ public class ProjectsApiController implements ProjectsApi {
 
         this.checkResource(userId,projectId);
 
-        if(!projectService.isAdminOfProject(userId,projectId)){
+        if(!gantryProject.isAdminOfProject(userId,projectId)){
             throw new ApiException(userId+"is not the admin of the project",HttpStatus.BAD_REQUEST);
         }
 
-        projectService.deleteMemberInProject(projectId,memberId);
+        gantryProject.deleteMemberInProject(projectId,memberId);
 
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
@@ -228,21 +234,21 @@ public class ProjectsApiController implements ProjectsApi {
 
         this.checkResource(userId,projectId);
 
-        if(!projectService.isOwnerOfProject(userId,projectId)){
+        if(!gantryProject.isOwnerOfProject(userId,projectId)){
             throw new ApiException(userId+"is not the owner of project",HttpStatus.BAD_REQUEST);
         }
 
         if(!owner.isEmpty() || !description.isEmpty()){
             attrs = new HashMap<String, String>();
             if(!owner.isEmpty()){
-                attrs.put(StaticConfig.OWNER,owner);
+                attrs.put(CommonConstants.OWNER,owner);
             }
             if(!description.isEmpty()){
-                attrs.put(StaticConfig.DESCRIPTION,description);
+                attrs.put(CommonConstants.DESCRIPTION,description);
             }
         }
 
-        projectService.updateProjectInfo(projectId,attrs);
+        gantryProject.updateProjectInfo(projectId,attrs);
 
         return new ResponseEntity<Void>(HttpStatus.OK);
     }

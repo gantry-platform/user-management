@@ -1,5 +1,5 @@
-package kr.co.inslab.service;
+package kr.co.inslab.utils;
 
-public interface MailSendingService {
+public interface MailSending {
     public void sendHtmlEmail(String from,String to,String subject,String html);
 }
