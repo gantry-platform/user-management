@@ -1,7 +1,7 @@
 package kr.co.inslab.keycloak;
 
-import kr.co.inslab.bootstrap.StaticConfig;
-import kr.co.inslab.exception.KeyCloakAdminException;
+import kr.co.inslab.utils.CommonConstants;
+import kr.co.inslab.gantry.UserException;
 import kr.co.inslab.model.*;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.ArrayList;
@@ -109,7 +110,6 @@ public abstract class AbstractKeyCloak {
     }
 
     protected void removeGroupById(String groupId){
-
         this.getRealm().groups().group(groupId).remove();
     }
 
@@ -145,6 +145,40 @@ public abstract class AbstractKeyCloak {
         return project;
     }
 
+    protected String createUser(String email) throws KeyCloakAdminException{
+
+        String [] splitEmail = email.split("@");
+        UserRepresentation userRepresentation = new UserRepresentation();
+        userRepresentation.setEmailVerified(false);
+        userRepresentation.setEnabled(true);
+        userRepresentation.setEmail(email);
+        userRepresentation.setUsername(splitEmail[0]);
+
+        List<String> actions = new ArrayList<>();
+        actions.add(CommonConstants.UPDATE_PROFILE);
+        actions.add(CommonConstants.UPDATE_PASSWORD);
+        actions.add(CommonConstants.VERIFY_EMAIL);
+        userRepresentation.setRequiredActions(actions);
+
+        Response response = this.getRealm().users().create(userRepresentation);
+
+         return  this.getCreatedId(response, email);
+
+    }
+
+    protected void checkUserById(String userId) throws KeyCloakAdminException, UserException {
+        try{
+            this.getUserResourceById(userId).toRepresentation();
+        }catch (Exception e){
+            if(e instanceof javax.ws.rs.WebApplicationException) {
+                String message = ((WebApplicationException)e).getResponse().getStatusInfo().getReasonPhrase();
+                int code = ((WebApplicationException)e).getResponse().getStatusInfo().getStatusCode();
+                throw new KeyCloakAdminException("[user_id : "+userId+"] "+message, HttpStatus.resolve(code));
+            }
+            throw e;
+        }
+    }
+
 
     protected Project makeProjectMetaInfo(GroupRepresentation groupRepresentation) {
         Project project = null;
@@ -158,10 +192,10 @@ public abstract class AbstractKeyCloak {
             if (groupAttrs != null) {
                 for (String key : groupAttrs.keySet()) {
                     switch (key) {
-                        case StaticConfig.DISPLAY_NAME:
+                        case CommonConstants.DISPLAY_NAME:
                             project.setDisplayName(groupAttrs.get(key).get(0));
                             break;
-                        case StaticConfig.OWNER:
+                        case CommonConstants.OWNER:
                             project.setOwner(groupAttrs.get(key).get(0));
                             break;
                     }
@@ -225,19 +259,19 @@ public abstract class AbstractKeyCloak {
         if (groupAttrs != null){
             for(String key : groupAttrs.keySet()){
                 switch (key){
-                    case StaticConfig.DESCRIPTION:
+                    case CommonConstants.DESCRIPTION:
                         project.setDescription(groupAttrs.get(key).get(0));
                         break;
-                    case StaticConfig.DISPLAY_NAME:
+                    case CommonConstants.DISPLAY_NAME:
                         project.setDisplayName(groupAttrs.get(key).get(0));
                         break;
-                    case StaticConfig.OWNER:
+                    case CommonConstants.OWNER:
                         project.setOwner(groupAttrs.get(key).get(0));
                         break;
-                    case StaticConfig.STATUS:
+                    case CommonConstants.STATUS:
                         project.setStatus(Project.StatusEnum.fromValue(groupAttrs.get(key).get(0)));
                         break;
-                    case StaticConfig.PENDING:
+                    case CommonConstants.PENDING:
                         if(pendingUsers == null){
                             pendingUsers = new ArrayList<>();
                         }

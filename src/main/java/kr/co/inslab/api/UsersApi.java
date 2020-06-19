@@ -5,14 +5,11 @@
  */
 package kr.co.inslab.api;
 
-import kr.co.inslab.exception.ApiException;
-import kr.co.inslab.exception.KeyCloakAdminException;
 import kr.co.inslab.model.Error;
 import kr.co.inslab.model.NewProject;
 import kr.co.inslab.model.Project;
 import kr.co.inslab.model.User;
 import io.swagger.annotations.*;
-import org.keycloak.common.VerificationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

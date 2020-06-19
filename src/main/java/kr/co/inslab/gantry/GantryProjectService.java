@@ -1,16 +1,12 @@
-package kr.co.inslab.service;
+package kr.co.inslab.gantry;
 
-
-import kr.co.inslab.exception.ApiException;
-import kr.co.inslab.exception.KeyCloakAdminException;
+import kr.co.inslab.utils.CommonConstants;
+import kr.co.inslab.keycloak.KeyCloakAdminException;
 import kr.co.inslab.keycloak.AbstractKeyCloak;
-import kr.co.inslab.bootstrap.StaticConfig;
-import kr.co.inslab.model.Group;
-import kr.co.inslab.model.Member;
-import kr.co.inslab.model.Project;
-import kr.co.inslab.model.SubGroup;
-import kr.co.inslab.util.HTMLTemplate;
-import kr.co.inslab.util.SimpleToken;
+import kr.co.inslab.model.*;
+import kr.co.inslab.utils.HTMLTemplate;
+import kr.co.inslab.utils.MailSending;
+import kr.co.inslab.utils.SimpleToken;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.GroupRepresentation;
@@ -23,29 +19,78 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectService {
+public class GantryProjectService extends AbstractKeyCloak implements GantryProject {
 
-    private final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(GantryProjectService.class);
 
     private final RedisTemplate<String,Object> redisTemplate;
 
-    private final MailSendingService mailSendingService;
+    private final MailSending mailSending;
 
     private final HTMLTemplate htmlTemplate;
 
-
-    public ProjectServiceImpl(Keycloak keycloakAdmin, RedisTemplate<String, Object> redisTemplate, MailSendingService mailSendingService, HTMLTemplate htmlTemplate) {
+    public GantryProjectService(Keycloak keycloakAdmin, RedisTemplate<String, Object> redisTemplate, MailSending mailSending, HTMLTemplate htmlTemplate) {
         super(keycloakAdmin);
         this.redisTemplate = redisTemplate;
-        this.mailSendingService = mailSendingService;
+        this.mailSending = mailSending;
         this.htmlTemplate = htmlTemplate;
     }
 
+
+    @Override
+    public Project createProject(String userId, String displayName, String description) throws ProjectException {
+        String projectId = null;
+        GroupRepresentation projectGroupRep = null;
+
+        String projectName = userId+"_"+displayName;
+        String adminGroupName = SubGroup.ADMIN.toString();
+        String opsGroupName = SubGroup.OPS.toString();
+        String devGroupName = SubGroup.DEV.toString();
+
+        Map<String,String> groupAttr = new HashMap<>();
+        groupAttr.put(CommonConstants.DISPLAY_NAME,displayName);
+        groupAttr.put(CommonConstants.OWNER,userId);
+        groupAttr.put(CommonConstants.STATUS, kr.co.inslab.model.Project.StatusEnum.ACTIVE.toString());
+
+        if(!description.isEmpty()){
+            groupAttr.put(CommonConstants.DESCRIPTION,description);
+        }
+
+        try{
+            projectGroupRep = this.createGroup(projectName,groupAttr);
+            projectId = projectGroupRep.getId();
+            GroupRepresentation adminGroupRep = this.addSubGroup(projectGroupRep, adminGroupName);
+            GroupRepresentation opsGroupRep = this.addSubGroup(projectGroupRep, opsGroupName);
+            GroupRepresentation devGroupRep = this.addSubGroup(projectGroupRep, devGroupName);
+            this.addRoleToGroup(adminGroupRep, Role.ADMIN);
+            this.addRoleToGroup(opsGroupRep, Role.OPS);
+            this.addRoleToGroup(devGroupRep, Role.DEV);
+            this.joinGroup(userId,projectGroupRep.getId());
+            this.joinGroup(userId,adminGroupRep.getId());
+        } catch (Exception e){
+            if(projectGroupRep != null){
+                this.removeGroupById(projectGroupRep.getId());
+                throw new ProjectException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            if (e instanceof KeyCloakAdminException){
+                throw new ProjectException((e.getMessage()),((KeyCloakAdminException) e).getHttpStatus());
+            }
+        }
+
+        kr.co.inslab.model.Project project = new kr.co.inslab.model.Project();
+        project.setDisplayName(displayName);
+        project.setName(projectName);
+        project.setId(projectId);
+
+        return project;
+    }
 
     @Override
     public Boolean existsUserInProject(String userId, String projectId){
@@ -61,22 +106,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
     }
 
     @Override
-    public void checkUserById(String userId) throws ApiException {
-        try{
-            this.getUserResourceById(userId).toRepresentation();
-        }catch (Exception e){
-            if(e instanceof javax.ws.rs.WebApplicationException) {
-                String message = ((WebApplicationException)e).getResponse().getStatusInfo().getReasonPhrase();
-                int code = ((WebApplicationException)e).getResponse().getStatusInfo().getStatusCode();
-                throw new ApiException("[user_id : "+userId+"] "+message, HttpStatus.resolve(code));
-            }
-            throw e;
-        }
-    }
-
-
-    @Override
-    public Project getProjectById(String projectId) throws ApiException {
+    public kr.co.inslab.model.Project getProjectById(String projectId) throws ProjectException {
         GroupRepresentation groupRepresentation;
         try{
             groupRepresentation = this.getGroupById(projectId);
@@ -84,7 +114,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
             if(e instanceof javax.ws.rs.WebApplicationException) {
                 String message = ((WebApplicationException)e).getResponse().getStatusInfo().getReasonPhrase();
                 int code = ((WebApplicationException)e).getResponse().getStatusInfo().getStatusCode();
-                throw new ApiException("[project_id : "+projectId+"] "+message, HttpStatus.resolve(code));
+                throw new ProjectException("[project_id : "+projectId+"] "+message, HttpStatus.resolve(code));
             }
             throw e;
         }
@@ -92,7 +122,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
     }
 
     @Override
-    public void updateProjectInfo(String projectId, Map<String,String> attrs) throws ApiException {
+    public void updateProjectInfo(String projectId, Map<String,String> attrs) throws ProjectException {
         GroupRepresentation groupRepresentation;
         try{
             groupRepresentation = this.getGroupById(projectId);
@@ -100,7 +130,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
             if(e instanceof javax.ws.rs.WebApplicationException) {
                 String message = ((WebApplicationException)e).getResponse().getStatusInfo().getReasonPhrase();
                 int code = ((WebApplicationException)e).getResponse().getStatusInfo().getStatusCode();
-                throw new ApiException("[project_id : "+projectId+"] "+message, HttpStatus.resolve(code));
+                throw new ProjectException("[project_id : "+projectId+"] "+message, HttpStatus.resolve(code));
             }
             throw e;
         }
@@ -116,7 +146,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
     public Boolean isOwnerOfProject(String userId,String projectId) {
         boolean isOwner = false;
         GroupRepresentation groupRepresentation = this.getGroupById(projectId);
-        Project project = this.makeProjectMetaInfo(groupRepresentation);
+        kr.co.inslab.model.Project project = this.makeProjectMetaInfo(groupRepresentation);
         if (project.getOwner().equals(userId)){
             isOwner = true;
         }
@@ -160,12 +190,12 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
     }
 
     @Override
-    public void deleteMemberInPending(String projectId,String email) throws ApiException {
+    public void deleteMemberInPending(String projectId,String email) throws ProjectException {
         List<UserRepresentation> userRepresentations = this.getUserByEmail(email);
         //Not Found User
         if(userRepresentations.size()==0){
-            throw new ApiException("["+email+"]"+"Not Found User", HttpStatus.NOT_FOUND);
-        //Exists User
+            throw new ProjectException("["+email+"]"+"Not Found User", HttpStatus.NOT_FOUND);
+            //Exists User
         }else if(userRepresentations.size()==1){
             GroupRepresentation groupRepresentation = this.getGroupById(projectId);
             this.removePendingUser(groupRepresentation,email);
@@ -178,59 +208,64 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
             if(!(userRepresentations.get(0).isEmailVerified())){
                 this.removeUser(userRepresentations.get(0).getId());
             }
-        //Multiple Users
+            //Multiple Users
         }else{
             for(UserRepresentation userRepresentation: userRepresentations){
                 logger.debug(userRepresentation.getEmail());
             }
             logger.error("Multiple Users Exception");
-            throw new ApiException("Multiple Users Exception",HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ProjectException("Multiple Users Exception",HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @Override
-    public List<Group> getGroupsByProjectId(String projectId) throws ApiException {
-        Project project = this.getProjectById(projectId);
+    public List<Group> getGroupsByProjectId(String projectId) throws ProjectException {
+        kr.co.inslab.model.Project project = this.getProjectById(projectId);
         return project.getGroups();
     }
 
     @Override
-    public void inviteUserToGroup(String email,String projectId,String groupId) throws KeyCloakAdminException, ApiException {
+    public void inviteUserToGroup(String email,String projectId,String groupId) throws ProjectException {
         List<UserRepresentation> userRepresentations = this.getUserByEmail(email);
         //New User
         if((userRepresentations == null) || (userRepresentations.size() == 0)){
             //TODO: 생성 error 처리 추가해야 함
+            String userId = null;
             GroupRepresentation topGroup = this.getGroupById(projectId);
             GroupRepresentation subGroup = this.getGroupById(groupId);
-            UserRepresentation userRepresentation = this.createUser(email);
-            UserResource userResource = this.getUserResourceById(userRepresentation.getId());
-            this.joinGroup(userRepresentation.getId(),topGroup.getId());
-            this.joinGroup(userRepresentation.getId(),subGroup.getId());
+            try{
+                userId = super.createUser(email);
+            }catch (KeyCloakAdminException e){
+                throw new ProjectException(e.getMessage(),e.getHttpStatus());
+            }
+            UserResource userResource = this.getUserResourceById(userId);
+            this.joinGroup(userId,topGroup.getId());
+            this.joinGroup(userId,subGroup.getId());
             userResource.sendVerifyEmail();
-        //Exists User
+            //Exists User
         }else if(userRepresentations.size()==1){
             //Make Join Info
             GroupRepresentation topGroup = this.getGroupById(projectId);
-            String projectName = topGroup.getAttributes().get(StaticConfig.DISPLAY_NAME).get(0);
+            String projectName = topGroup.getAttributes().get(CommonConstants.DISPLAY_NAME).get(0);
             String token = SimpleToken.generateNewToken();
             Map<String,String> joinInfo = this.makeJoinInfo(projectId,groupId,userRepresentations.get(0).getId(),token);
 
             //Save to redis
             ValueOperations<String,Object> valueOperations = redisTemplate.opsForValue();
             valueOperations.set(email,joinInfo);
-            redisTemplate.expire(token,24,TimeUnit.HOURS);
+            redisTemplate.expire(token,24, TimeUnit.HOURS);
 
             //Send email
-            String inviteHtml = htmlTemplate.makeInviteHtml(StaticConfig.INVITE,token,email);
-            mailSendingService.sendHtmlEmail(StaticConfig.NO_REPLY_GANTRY_AI,email,StaticConfig.GANTRY+ " Project 초대 메일",inviteHtml);
+            String inviteHtml = htmlTemplate.makeInviteHtml(CommonConstants.INVITE,token,email);
+            mailSending.sendHtmlEmail(CommonConstants.NO_REPLY_GANTRY_AI,email, CommonConstants.GANTRY+ " Project 초대 메일",inviteHtml);
             this.addPendingUser(topGroup,email);
-        //Multiple Users
+            //Multiple Users
         }else{
             for(UserRepresentation userRepresentation: userRepresentations){
                 logger.debug(userRepresentation.getEmail());
             }
             logger.error("Multiple Users Exception");
-            throw new ApiException("Multiple Users Exception",HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ProjectException("Multiple Users Exception",HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -273,45 +308,44 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
 
     @Override
-    public Boolean joinNewProjectAndGroupForExistsUser(String token, String email) throws ApiException {
+    public Boolean joinNewProjectAndGroupForExistsUser(String mailToken, String email) throws ProjectException{
         ValueOperations<String,Object> valueOperations = redisTemplate.opsForValue();
         @SuppressWarnings("unchecked")
         HashMap<String,String> joinInfo = (HashMap<String, String>) valueOperations.get(email);
 
         if(joinInfo != null){
-            String groupId = joinInfo.get(StaticConfig.GROUP_ID);
-            String projectId = joinInfo.get(StaticConfig.PROJECT_ID);
-            String userId = joinInfo.get(StaticConfig.USER_ID);
-            String savedToken = joinInfo.get(StaticConfig.TOKEN);
+            String groupId = joinInfo.get(CommonConstants.GROUP_ID);
+            String projectId = joinInfo.get(CommonConstants.PROJECT_ID);
+            String userId = joinInfo.get(CommonConstants.USER_ID);
+            String savedToken = joinInfo.get(CommonConstants.TOKEN);
 
-            if(!(savedToken.equals(token))){
-                throw new ApiException("Invalid Request",HttpStatus.BAD_REQUEST);
+            if(!(savedToken.equals(mailToken))){
+                throw new ProjectException("Invalid Request",HttpStatus.BAD_REQUEST);
             }
 
             GroupRepresentation groupRepresentation = this.getGroupById(projectId);
             this.joinGroup(userId,projectId);
             this.joinGroup(userId,groupId);
 
-
             this.removePendingUser(groupRepresentation,email);
 
-           return true;
+            return true;
         }
         return false;
     }
 
     private Map<String,String> makeJoinInfo(String projectId,String groupId,String userId,String token){
         Map<String,String> joinInfo = new HashMap<>();
-        joinInfo.put(StaticConfig.PROJECT_ID,projectId);
-        joinInfo.put(StaticConfig.GROUP_ID,groupId);
-        joinInfo.put(StaticConfig.USER_ID,userId);
-        joinInfo.put(StaticConfig.TOKEN,token);
+        joinInfo.put(CommonConstants.PROJECT_ID,projectId);
+        joinInfo.put(CommonConstants.GROUP_ID,groupId);
+        joinInfo.put(CommonConstants.USER_ID,userId);
+        joinInfo.put(CommonConstants.TOKEN,token);
         return joinInfo;
     }
 
     private void addPendingUser(GroupRepresentation groupRepresentation, String email){
         Map<String, List<String>> projectAttrs = groupRepresentation.getAttributes();
-        List<String> pendingUsers = projectAttrs.get(StaticConfig.PENDING);
+        List<String> pendingUsers = projectAttrs.get(CommonConstants.PENDING);
 
         if(pendingUsers == null){
             pendingUsers = new ArrayList<>();
@@ -319,7 +353,7 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
         if(!pendingUsers.contains(email)){
             pendingUsers.add(email);
-            projectAttrs.put(StaticConfig.PENDING,pendingUsers);
+            projectAttrs.put(CommonConstants.PENDING,pendingUsers);
             groupRepresentation.setAttributes(projectAttrs);
             this.updateGroup(groupRepresentation.getId(),groupRepresentation);
         }
@@ -328,37 +362,13 @@ public class ProjectServiceImpl extends AbstractKeyCloak implements ProjectServi
 
     public void removePendingUser(GroupRepresentation groupRepresentation,String email) {
         Map<String, List<String>> projectAttrs = groupRepresentation.getAttributes();
-        List<String> pendingUsers = projectAttrs.get(StaticConfig.PENDING);
+        List<String> pendingUsers = projectAttrs.get(CommonConstants.PENDING);
 
         if(pendingUsers !=null && pendingUsers.contains(email)){
             pendingUsers.remove(email);
-            projectAttrs.put(StaticConfig.PENDING,pendingUsers);
+            projectAttrs.put(CommonConstants.PENDING,pendingUsers);
             groupRepresentation.setAttributes(projectAttrs);
             this.updateGroup(groupRepresentation.getId(),groupRepresentation);
         }
     }
-
-
-    private UserRepresentation createUser(String email) throws KeyCloakAdminException {
-        String [] splitEmail = email.split("@");
-        UserRepresentation userRepresentation = new UserRepresentation();
-        userRepresentation.setEmailVerified(false);
-        userRepresentation.setEnabled(true);
-        userRepresentation.setEmail(email);
-        userRepresentation.setUsername(splitEmail[0]);
-
-        List<String> actions = new ArrayList<>();
-        actions.add(StaticConfig.UPDATE_PROFILE);
-        actions.add(StaticConfig.UPDATE_PASSWORD);
-        actions.add(StaticConfig.VERIFY_EMAIL);
-        userRepresentation.setRequiredActions(actions);
-
-        Response response = this.getRealm().users().create(userRepresentation);
-        String createdId = getCreatedId(response,email);
-        userRepresentation.setId(createdId);
-
-        return userRepresentation;
-    }
-
-
 }

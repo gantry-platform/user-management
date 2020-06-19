@@ -1,12 +1,12 @@
-package kr.co.inslab.exception;
+package kr.co.inslab.keycloak;
 
 import org.springframework.http.HttpStatus;
 
-public class ApiException extends Exception{
+public class KeyCloakAdminException extends Exception{
 
     private final HttpStatus httpStatus;
 
-    public ApiException(String message, HttpStatus httpStatus) {
+    public KeyCloakAdminException(String message, HttpStatus httpStatus) {
         super(message);
         this.httpStatus = httpStatus;
     }

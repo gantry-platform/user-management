@@ -1,6 +1,6 @@
 package kr.co.inslab.interceptor;
 
-import kr.co.inslab.service.LoggingService;
+import kr.co.inslab.utils.HttpLogging;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -14,11 +14,11 @@ import java.lang.reflect.Type;
 @ControllerAdvice
 public class CustomRequestBodyAdviceAdapter extends RequestBodyAdviceAdapter {
 
-    private final LoggingService loggingService;
+    private final HttpLogging httpLogging;
     private final HttpServletRequest httpServletRequest;
 
-    public CustomRequestBodyAdviceAdapter(LoggingService loggingService, HttpServletRequest httpServletRequest) {
-        this.loggingService = loggingService;
+    public CustomRequestBodyAdviceAdapter(HttpLogging httpLogging, HttpServletRequest httpServletRequest) {
+        this.httpLogging = httpLogging;
         this.httpServletRequest = httpServletRequest;
     }
 
@@ -31,7 +31,7 @@ public class CustomRequestBodyAdviceAdapter extends RequestBodyAdviceAdapter {
     @Override
     public Object afterBodyRead(Object body, HttpInputMessage inputMessage, MethodParameter parameter, Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
 
-        loggingService.logRequest(httpServletRequest,body);
+        httpLogging.logRequest(httpServletRequest,body);
         return super.afterBodyRead(body, inputMessage, parameter, targetType, converterType);
     }
 }

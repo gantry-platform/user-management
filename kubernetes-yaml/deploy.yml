@@ -6,7 +6,7 @@ metadata:
   labels:
     app: user
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: user
@@ -21,9 +21,5 @@ spec:
           ports:
           - containerPort: 8080
           args: ["--spring.profiles.active=prod"]
-        - name: redis
-          image: redis:latest
-          ports:
-            - containerPort: 6379
       imagePullSecrets:
         - name: harbor
