@@ -12,6 +12,7 @@ import org.keycloak.TokenVerifier;
 import org.keycloak.representations.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -37,6 +38,9 @@ public class ProjectsApiController implements ProjectsApi {
     private final GantryProject gantryProject;
 
     private final GantryUser gantryUser;
+
+    @Value("${dashboard.url}")
+    private String dashboardUrl;
 
     @org.springframework.beans.factory.annotation.Autowired
     public ProjectsApiController(ObjectMapper objectMapper, HttpServletRequest request, GantryProject gantryProject, GantryUser gantryUser) {
@@ -65,7 +69,7 @@ public class ProjectsApiController implements ProjectsApi {
         if(success == false){
             return "intive-failure";
         }
-        return "invite-success";
+        return "redirect:"+dashboardUrl;
     }
 
     @Override
@@ -118,7 +122,7 @@ public class ProjectsApiController implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<kr.co.inslab.model.Project> projectsProjectIdGet(String projectId) throws Exception {
+    public ResponseEntity<Project> projectsProjectIdGet(String projectId) throws Exception {
 
         //임시코드
         String userId = this.getUserId(request);

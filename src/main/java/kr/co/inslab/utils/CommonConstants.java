@@ -21,4 +21,5 @@ public class CommonConstants {
     public final static String EMAIL = "email";
     public final static String INVITE = "invite";
     public final static String NO_REPLY_GANTRY_AI = "noreply@gantry.ai";
+    public final static String MAIL_INVITE_URL = "mailInviteUrl";
 }
