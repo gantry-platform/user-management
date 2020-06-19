@@ -6,7 +6,7 @@ metadata:
   labels:
     app: user
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: user
@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: user
-          image: harbor.gantry.ai/gantry/user-management:0.1
+          image: harbor.gantry.ai/gantry/user-management:0.1.1
           ports:
           - containerPort: 8080
           args: ["--spring.profiles.active=prod"]
