@@ -22,4 +22,9 @@ public class CommonConstants {
     public final static String INVITE = "invite";
     public final static String NO_REPLY_GANTRY_AI = "noreply@gantry.ai";
     public final static String MAIL_INVITE_URL = "mailInviteUrl";
+    public static final String CLIENT_ID = "client_id";
+    public static final String CLIENT_SECRET = "client_secret";
+    public static final String PASSWORD = "password";
+    public static final String USERNAME = "username";
+    public static final String GRANT_TYPE = "grant_type";
 }

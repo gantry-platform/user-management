@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: user
-  namespace: user-management
+  namespace: gantry
   labels:
     app: user
 spec:
@@ -21,6 +21,6 @@ spec:
           imagePullPolicy: Always
           ports:
           - containerPort: 8080
-          args: ["--spring.profiles.active=prod"]
+          args: ["--spring.profiles.active=dev"]
       imagePullSecrets:
-        - name: harbor
+        - name: harbor-cred
