@@ -238,15 +238,16 @@ public class ProjectsApiController implements ProjectsApi {
             throw new ApiException(userId+"is not the owner of project",HttpStatus.BAD_REQUEST);
         }
 
-        if(!owner.isEmpty() || !description.isEmpty()){
-            attrs = new HashMap<String, String>();
-            if(!owner.isEmpty()){
-                attrs.put(CommonConstants.OWNER,owner);
-            }
-            if(!description.isEmpty()){
-                attrs.put(CommonConstants.DESCRIPTION,description);
-            }
+
+        attrs = new HashMap<String, String>();
+
+        if(owner!=null && !owner.isEmpty()){
+            attrs.put(CommonConstants.OWNER,owner);
         }
+        if(description!=null && !description.isEmpty()){
+            attrs.put(CommonConstants.DESCRIPTION,description);
+        }
+
 
         gantryProject.updateProjectInfo(projectId,attrs);
 
