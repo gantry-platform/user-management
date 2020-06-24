@@ -2,14 +2,12 @@ package kr.co.inslab;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.inslab.api.ProjectsApiController;
-import kr.co.inslab.api.UsersApiController;
 import kr.co.inslab.model.*;
 import kr.co.inslab.utils.CommonConstants;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
