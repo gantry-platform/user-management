@@ -5,49 +5,23 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
-import kr.co.inslab.model.Member;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * Group
+ * NewProject
  */
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-06-24T14:41:19.866+09:00[Asia/Seoul]")
-public class Group   {
-  @JsonProperty("id")
-  private String id = null;
-
+public class NewProject   {
   @JsonProperty("name")
   private String name = null;
 
-  @JsonProperty("members")
-  @Valid
-  private List<Member> members = null;
+  @JsonProperty("description")
+  private String description = null;
 
-  public Group id(String id) {
-    this.id = id;
-    return this;
-  }
-
-  /**
-   * Get id
-   * @return id
-  **/
-  @ApiModelProperty(value = "")
-  
-    public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public Group name(String name) {
+  public NewProject name(String name) {
     this.name = name;
     return this;
   }
@@ -56,8 +30,9 @@ public class Group   {
    * Get name
    * @return name
   **/
-  @ApiModelProperty(value = "")
-  
+  @ApiModelProperty(required = true, value = "")
+      @NotNull
+
     public String getName() {
     return name;
   }
@@ -66,31 +41,23 @@ public class Group   {
     this.name = name;
   }
 
-  public Group members(List<Member> members) {
-    this.members = members;
-    return this;
-  }
-
-  public Group addMembersItem(Member membersItem) {
-    if (this.members == null) {
-      this.members = new ArrayList<Member>();
-    }
-    this.members.add(membersItem);
+  public NewProject description(String description) {
+    this.description = description;
     return this;
   }
 
   /**
-   * Get members
-   * @return members
+   * Get description
+   * @return description
   **/
   @ApiModelProperty(value = "")
-      @Valid
-    public List<Member> getMembers() {
-    return members;
+  
+    public String getDescription() {
+    return description;
   }
 
-  public void setMembers(List<Member> members) {
-    this.members = members;
+  public void setDescription(String description) {
+    this.description = description;
   }
 
 
@@ -102,25 +69,23 @@ public class Group   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Group group = (Group) o;
-    return Objects.equals(this.id, group.id) &&
-        Objects.equals(this.name, group.name) &&
-        Objects.equals(this.members, group.members);
+    NewProject newProject = (NewProject) o;
+    return Objects.equals(this.name, newProject.name) &&
+        Objects.equals(this.description, newProject.description);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, members);
+    return Objects.hash(name, description);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Group {\n");
+    sb.append("class NewProject {\n");
     
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    members: ").append(toIndentedString(members)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("}");
     return sb.toString();
   }

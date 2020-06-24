@@ -55,11 +55,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /users/projects:
+  /projects:
     post:
       summary: 신규 프로젝트 생성
       tags:
-        - users
+        - projects
       requestBody:
         required: true
         content:
@@ -556,8 +556,6 @@ components:
           type: string
         name:
           type: string
-        display_name:
-          type: string
         description:
           type: string
         owner:
@@ -589,8 +587,6 @@ components:
           type: string
         name:
           type: string
-        display_name:
-          type: string
         members:
           type: array
           items:
@@ -609,9 +605,9 @@ components:
     NewProject:
       type: object
       required:
-        - display_name
+        - name
       properties:
-        display_name:
+        name:
           type: string
         description:
           type: string

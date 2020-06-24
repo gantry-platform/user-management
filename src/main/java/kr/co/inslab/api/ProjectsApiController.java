@@ -1,13 +1,11 @@
 package kr.co.inslab.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.annotations.ApiParam;
+import kr.co.inslab.model.*;
 import kr.co.inslab.utils.CommonConstants;
 import kr.co.inslab.gantry.GantryProject;
 import kr.co.inslab.gantry.GantryUser;
-import kr.co.inslab.model.Group;
-import kr.co.inslab.model.Member;
-import kr.co.inslab.model.Project;
-import kr.co.inslab.model.UpdateProject;
 import org.keycloak.TokenVerifier;
 import org.keycloak.representations.AccessToken;
 import org.slf4j.Logger;
@@ -16,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.context.request.WebRequest;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,6 +54,24 @@ public class ProjectsApiController implements ProjectsApi {
         gantryUser.checkUserById(userId);
         gantryProject.checkProjectByProjectId(projectId);
     }
+
+    @Override
+    public ResponseEntity<Project> projectsPost(NewProject body) throws Exception{
+
+        //임시코드
+        String userId = this.getUserId(request);
+        gantryUser.checkUserById(userId);
+
+        String name = body.getName();
+        String description = body.getDescription();
+
+        Project project = gantryProject.createProject(userId,name,description);
+
+        ResponseEntity<kr.co.inslab.model.Project> res = new ResponseEntity<kr.co.inslab.model.Project>(project,HttpStatus.OK);
+
+        return res;
+    }
+
 
     @Override
     public String confirmJoin(WebRequest request,String token, String email) throws Exception {

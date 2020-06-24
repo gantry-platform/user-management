@@ -114,7 +114,7 @@ public class UsersApiTest {
 
         NewProject newProject = new NewProject();
         newProject.setDescription("test");
-        newProject.setDisplayName("project");
+        newProject.setName("project");
 
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -129,9 +129,9 @@ public class UsersApiTest {
         String content = mvcResult.getResponse().getContentAsString();
         Project project = objectMapper.readValue(content, Project.class);
 
-        String displayName = project.getDisplayName();
+        String projectName = project.getName();
 
-        assertThat(displayName).isEqualTo("project");
+        assertThat(projectName).isEqualTo("project");
 
     }
 }

@@ -18,16 +18,13 @@ import javax.validation.constraints.*;
  * Project
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-03-20T16:37:02.439+09:00[Asia/Seoul]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-06-24T14:41:19.866+09:00[Asia/Seoul]")
 public class Project   {
   @JsonProperty("id")
   private String id = null;
 
   @JsonProperty("name")
   private String name = null;
-
-  @JsonProperty("display_name")
-  private String displayName = null;
 
   @JsonProperty("description")
   private String description = null;
@@ -112,25 +109,6 @@ public class Project   {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public Project displayName(String displayName) {
-    this.displayName = displayName;
-    return this;
-  }
-
-  /**
-   * Get displayName
-   * @return displayName
-  **/
-  @ApiModelProperty(value = "")
-  
-    public String getDisplayName() {
-    return displayName;
-  }
-
-  public void setDisplayName(String displayName) {
-    this.displayName = displayName;
   }
 
   public Project description(String description) {
@@ -256,7 +234,6 @@ public class Project   {
     Project project = (Project) o;
     return Objects.equals(this.id, project.id) &&
         Objects.equals(this.name, project.name) &&
-        Objects.equals(this.displayName, project.displayName) &&
         Objects.equals(this.description, project.description) &&
         Objects.equals(this.owner, project.owner) &&
         Objects.equals(this.status, project.status) &&
@@ -266,7 +243,7 @@ public class Project   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, displayName, description, owner, status, groups, pendingUsers);
+    return Objects.hash(id, name, description, owner, status, groups, pendingUsers);
   }
 
   @Override
@@ -276,7 +253,6 @@ public class Project   {
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    owner: ").append(toIndentedString(owner)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");

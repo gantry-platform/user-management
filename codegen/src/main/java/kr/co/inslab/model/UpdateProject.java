@@ -10,37 +10,37 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * NewProject
+ * UpdateProject
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-06-24T14:30:11.843+09:00[Asia/Seoul]")
-public class NewProject   {
-  @JsonProperty("name")
-  private String name = null;
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-06-24T14:41:19.866+09:00[Asia/Seoul]")
+public class UpdateProject   {
+  @JsonProperty("owner")
+  private String owner = null;
 
   @JsonProperty("description")
   private String description = null;
 
-  public NewProject name(String name) {
-    this.name = name;
+  public UpdateProject owner(String owner) {
+    this.owner = owner;
     return this;
   }
 
   /**
-   * Get name
-   * @return name
+   * Get owner
+   * @return owner
   **/
   @ApiModelProperty(value = "")
   
-    public String getName() {
-    return name;
+    public String getOwner() {
+    return owner;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setOwner(String owner) {
+    this.owner = owner;
   }
 
-  public NewProject description(String description) {
+  public UpdateProject description(String description) {
     this.description = description;
     return this;
   }
@@ -68,22 +68,22 @@ public class NewProject   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    NewProject newProject = (NewProject) o;
-    return Objects.equals(this.name, newProject.name) &&
-        Objects.equals(this.description, newProject.description);
+    UpdateProject updateProject = (UpdateProject) o;
+    return Objects.equals(this.owner, updateProject.owner) &&
+        Objects.equals(this.description, updateProject.description);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, description);
+    return Objects.hash(owner, description);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class NewProject {\n");
+    sb.append("class UpdateProject {\n");
     
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    owner: ").append(toIndentedString(owner)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("}");
     return sb.toString();

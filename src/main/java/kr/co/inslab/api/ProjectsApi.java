@@ -5,27 +5,34 @@
  */
 package kr.co.inslab.api;
 
-import kr.co.inslab.model.Error;
-import kr.co.inslab.model.Group;
-import kr.co.inslab.model.Member;
-import kr.co.inslab.model.Project;
-import kr.co.inslab.model.UpdateProject;
 import io.swagger.annotations.*;
+import kr.co.inslab.model.Error;
+import kr.co.inslab.model.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
 import javax.validation.Valid;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-03-27T14:04:16.475+09:00[Asia/Seoul]")
 @Api(value = "Projects", description = "the Projects API")
 public interface ProjectsApi {
+
+    @ApiOperation(value = "신규 프로젝트 생성", nickname = "projectsPost", notes = "", response = Project.class, tags={ "projects", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Create", response = Project.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 409, message = "Conflict", response = Error.class) })
+    @RequestMapping(value = "/projects",
+            produces = { "application/json" },
+            consumes = { "application/json" },
+            method = RequestMethod.POST)
+    ResponseEntity<Project> projectsPost(@ApiParam(value = "" ,required=true )  @Valid @RequestBody NewProject body
+    ) throws Exception;
 
     @ApiOperation(value = "프로젝트 활성화", nickname = "projectsProjectIdActivePut", notes = "", tags={ "projects", })
     @ApiResponses(value = {
