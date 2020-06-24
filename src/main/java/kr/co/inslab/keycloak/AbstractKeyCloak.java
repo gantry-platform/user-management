@@ -191,13 +191,8 @@ public abstract class AbstractKeyCloak {
 
             if (groupAttrs != null) {
                 for (String key : groupAttrs.keySet()) {
-                    switch (key) {
-                        case CommonConstants.DISPLAY_NAME:
-                            project.setDisplayName(groupAttrs.get(key).get(0));
-                            break;
-                        case CommonConstants.OWNER:
-                            project.setOwner(groupAttrs.get(key).get(0));
-                            break;
+                    if (CommonConstants.OWNER.equals(key)) {
+                        project.setOwner(groupAttrs.get(key).get(0));
                     }
                 }
             }
@@ -261,9 +256,6 @@ public abstract class AbstractKeyCloak {
                 switch (key){
                     case CommonConstants.DESCRIPTION:
                         project.setDescription(groupAttrs.get(key).get(0));
-                        break;
-                    case CommonConstants.DISPLAY_NAME:
-                        project.setDisplayName(groupAttrs.get(key).get(0));
                         break;
                     case CommonConstants.OWNER:
                         project.setOwner(groupAttrs.get(key).get(0));

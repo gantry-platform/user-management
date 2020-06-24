@@ -107,8 +107,8 @@ public class ProjectApiTest {
         ObjectMapper objectMapper = new ObjectMapper();
         User user = objectMapper.readValue(content, User.class);
 
-        String name = user.getUserName();
-        assertThat(name).isEqualTo(TEST_USER_NAME);
+        String userName = user.getUserName();
+        assertThat(userName).isEqualTo(TEST_USER_NAME);
 
     }
 
@@ -118,13 +118,13 @@ public class ProjectApiTest {
 
         NewProject newProject = new NewProject();
         newProject.setDescription("test");
-        newProject.setDisplayName("project_api_test");
+        newProject.setName("project_api_test");
 
 
         ObjectMapper objectMapper = new ObjectMapper();
         String newProjectStr = objectMapper.writeValueAsString(newProject);
 
-        MvcResult mvcResult = this.mockMvc.perform(post("/users/projects")
+        MvcResult mvcResult = this.mockMvc.perform(post("/projects")
                 .header(AUTHORIZATION, BEARER + accessToken)
                 .content(newProjectStr)
                 .accept(MediaType.APPLICATION_JSON)
@@ -133,9 +133,9 @@ public class ProjectApiTest {
         String content = mvcResult.getResponse().getContentAsString();
         Project project = objectMapper.readValue(content, Project.class);
 
-        String displayName = project.getDisplayName();
+        String projectName = project.getName();
 
-        assertThat(displayName).isEqualTo("project_api_test");
+        assertThat(projectName).isEqualTo("project_api_test");
 
         projectId = project.getId();
 
@@ -156,8 +156,8 @@ public class ProjectApiTest {
         ObjectMapper objectMapper = new ObjectMapper();
         Project project = objectMapper.readValue(content, Project.class);
 
-        String projectDisplayName = project.getDisplayName();
-        assertThat(projectDisplayName).isEqualTo("project_api_test");
+        String projectName = project.getName();
+        assertThat(projectName).isEqualTo("project_api_test");
 
     }
 

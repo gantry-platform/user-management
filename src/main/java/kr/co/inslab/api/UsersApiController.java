@@ -59,22 +59,6 @@ public class UsersApiController implements UsersApi {
         return res;
     }
 
-    @Override
-    public ResponseEntity<kr.co.inslab.model.Project> usersProjectsPost(NewProject body) throws Exception {
-        //임시코드
-        String userId = this.getUserId(request);
-        gantryUser.checkUserById(userId);
-
-        String displayName = body.getDisplayName();
-        String description = body.getDescription();
-
-       Project project = gantryProject.createProject(userId,displayName,description);
-
-        ResponseEntity<kr.co.inslab.model.Project> res = new ResponseEntity<kr.co.inslab.model.Project>(project,HttpStatus.OK);
-
-        return res;
-    }
-
     //임시코드
     private final String getUserId(HttpServletRequest request) throws Exception {
         String userId = null;

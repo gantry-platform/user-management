@@ -45,17 +45,15 @@ public class GantryProjectService extends AbstractKeyCloak implements GantryProj
 
 
     @Override
-    public Project createProject(String userId, String displayName, String description) throws ProjectException {
+    public Project createProject(String userId, String name, String description) throws ProjectException {
         String projectId = null;
         GroupRepresentation projectGroupRep = null;
 
-        String projectName = userId+"_"+displayName;
         String adminGroupName = SubGroup.ADMIN.toString();
         String opsGroupName = SubGroup.OPS.toString();
         String devGroupName = SubGroup.DEV.toString();
 
         Map<String,String> groupAttr = new HashMap<>();
-        groupAttr.put(CommonConstants.DISPLAY_NAME,displayName);
         groupAttr.put(CommonConstants.OWNER,userId);
         groupAttr.put(CommonConstants.STATUS, kr.co.inslab.model.Project.StatusEnum.ACTIVE.toString());
 
@@ -64,7 +62,7 @@ public class GantryProjectService extends AbstractKeyCloak implements GantryProj
         }
 
         try{
-            projectGroupRep = this.createGroup(projectName,groupAttr);
+            projectGroupRep = this.createGroup(name,groupAttr);
             projectId = projectGroupRep.getId();
             GroupRepresentation adminGroupRep = this.addSubGroup(projectGroupRep, adminGroupName);
             GroupRepresentation opsGroupRep = this.addSubGroup(projectGroupRep, opsGroupName);
@@ -84,9 +82,8 @@ public class GantryProjectService extends AbstractKeyCloak implements GantryProj
             }
         }
 
-        kr.co.inslab.model.Project project = new kr.co.inslab.model.Project();
-        project.setDisplayName(displayName);
-        project.setName(projectName);
+        Project project = new Project();
+        project.setName(name);
         project.setId(projectId);
 
         return project;
@@ -106,7 +103,7 @@ public class GantryProjectService extends AbstractKeyCloak implements GantryProj
     }
 
     @Override
-    public kr.co.inslab.model.Project getProjectById(String projectId) throws ProjectException {
+    public Project getProjectById(String projectId) throws ProjectException {
         GroupRepresentation groupRepresentation;
         try{
             groupRepresentation = this.getGroupById(projectId);
@@ -246,7 +243,6 @@ public class GantryProjectService extends AbstractKeyCloak implements GantryProj
         }else if(userRepresentations.size()==1){
             //Make Join Info
             GroupRepresentation topGroup = this.getGroupById(projectId);
-            String projectName = topGroup.getAttributes().get(CommonConstants.DISPLAY_NAME).get(0);
             String token = SimpleToken.generateNewToken();
             Map<String,String> joinInfo = this.makeJoinInfo(projectId,groupId,userRepresentations.get(0).getId(),token);
 
