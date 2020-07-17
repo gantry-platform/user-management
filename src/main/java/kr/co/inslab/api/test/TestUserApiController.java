@@ -19,7 +19,7 @@ import javax.validation.Valid;
 @Controller
 public class TestUserApiController implements TestUserApi {
 
-    private static final Logger log = LoggerFactory.getLogger(UsersApiController.class);
+    private static final Logger log = LoggerFactory.getLogger(TestUserApiController.class);
 
     private final GantryUser gantryUser;
 
@@ -30,7 +30,7 @@ public class TestUserApiController implements TestUserApi {
 
     @Override
     public ResponseEntity<Void> usersPost(@Valid NewUser body) throws Exception {
-        this.gantryUser.createTesUser(body);
+        this.gantryUser.createTestUser(body);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
