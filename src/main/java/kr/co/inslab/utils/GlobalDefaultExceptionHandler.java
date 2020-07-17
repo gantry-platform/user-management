@@ -1,7 +1,7 @@
 package kr.co.inslab.utils;
 
 
-import kr.co.inslab.api.ApiException;
+import kr.co.inslab.gantry.UserException;
 import kr.co.inslab.keycloak.KeyCloakAdminException;
 import kr.co.inslab.model.Error;
 import org.keycloak.common.VerificationException;
@@ -31,16 +31,6 @@ public class GlobalDefaultExceptionHandler extends ResponseEntityExceptionHandle
 
     }
 
-    @ExceptionHandler(ApiException.class)
-    public ResponseEntity<Error> apiExceptionHandler(Exception ex,HttpServletResponse response) throws Exception{
-        ex.printStackTrace();
-        Error err = new Error();
-        HttpStatus status = ((ApiException) ex).getHttpStatus();
-        err.setCode(status.toString());
-        err.setMessage(ex.getMessage());
-        return new ResponseEntity<>(err,status);
-    }
-
     @ExceptionHandler(KeyCloakAdminException.class)
     public ResponseEntity<Error> keyCloakExceptionHandler(Exception ex,HttpServletResponse response) throws Exception{
         ex.printStackTrace();
@@ -59,6 +49,17 @@ public class GlobalDefaultExceptionHandler extends ResponseEntityExceptionHandle
         int statusCode = ((WebApplicationException) ex).getResponse().getStatus();
         String message = ((WebApplicationException) ex).getResponse().getStatusInfo().getReasonPhrase();
         HttpStatus status = HttpStatus.resolve(statusCode);
+        err.setCode(status.toString());
+        err.setMessage(message);
+        return new ResponseEntity<>(err,status);
+    }
+
+    @ExceptionHandler(UserException.class)
+    public ResponseEntity<Error> userException(Exception ex,HttpServletResponse response) throws Exception{
+        ex.printStackTrace();
+        Error err = new Error();
+        HttpStatus status = ((UserException) ex).getHttpStatus();
+        String message = ((UserException) ex).getMessage();
         err.setCode(status.toString());
         err.setMessage(message);
         return new ResponseEntity<>(err,status);

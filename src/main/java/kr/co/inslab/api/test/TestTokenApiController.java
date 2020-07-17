@@ -1,4 +1,4 @@
-package kr.co.inslab.api;
+package kr.co.inslab.api.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiParam;
@@ -16,13 +16,13 @@ import javax.servlet.http.HttpServletRequest;
 
 @Profile("test")
 @Controller
-public class TokenApiController implements TokenApi{
+public class TestTokenApiController implements TestTokenApi {
 
-    private static final Logger log = LoggerFactory.getLogger(TokenApiController.class);
+    private static final Logger log = LoggerFactory.getLogger(TestTokenApiController.class);
 
     private final OAuthToken oAuthToken;
 
-    public TokenApiController(ObjectMapper objectMapper, HttpServletRequest request, OAuthToken oAuthToken) {
+    public TestTokenApiController(ObjectMapper objectMapper, HttpServletRequest request, OAuthToken oAuthToken) {
         this.oAuthToken = oAuthToken;
     }
 

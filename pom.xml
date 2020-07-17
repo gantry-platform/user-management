@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>inslab-gantry-user</groupId>
+    <groupId>inslab-gantry</groupId>
     <artifactId>user-management</artifactId>
     <packaging>jar</packaging>
     <name>user-management</name>
@@ -87,7 +87,12 @@
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
             <version>2.2.5.RELEASE</version>
         </dependency>
-
+        <!--jwt-->
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>3.10.3</version>
+        </dependency>
         <!--kubernetes-->
 <!--        <dependency>
             <groupId>org.springframework.cloud</groupId>

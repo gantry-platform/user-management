@@ -1,4 +1,4 @@
-package kr.co.inslab.api;
+package kr.co.inslab.api.test;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-public interface TokenApi {
+public interface TestTokenApi {
 
     @ApiOperation(value = "password grant 토큰 획득", nickname = "tokenPost", notes = "Call keycloak token endpoint", response = Token.class, tags={ "token", })
     @ApiResponses(value = {
