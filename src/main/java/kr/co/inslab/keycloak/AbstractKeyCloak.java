@@ -124,7 +124,6 @@ public abstract class AbstractKeyCloak {
 
     protected void createTestUser(UserRepresentation userRepresentation){
         this.getRealm().users().create(userRepresentation);
-
     }
 
     protected void checkUserById(String userId) throws KeyCloakAdminException, UserException {

@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import kr.co.inslab.model.Error;
 import kr.co.inslab.model.NewUser;
-import kr.co.inslab.model.UpdateUser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;

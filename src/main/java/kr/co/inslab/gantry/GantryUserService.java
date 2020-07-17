@@ -71,13 +71,13 @@ public class GantryUserService extends AbstractKeyCloak implements GantryUser {
     }
 
     @Override
-    public void deleteUser(String userId) throws UserException{
+    public void deleteUser(String userId){
         super.removeUser(userId);
     }
 
     //for test
     @Override
-    public void createTesUser(NewUser newUser) throws Exception {
+    public void createTestUser(NewUser newUser){
         UserRepresentation userRepresentation = new UserRepresentation();
         userRepresentation.setEmailVerified(true);
         userRepresentation.setEnabled(true);
