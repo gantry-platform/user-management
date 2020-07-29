@@ -9,3 +9,4 @@ bin/
 .swagger-codegen-ignore
 *.iml
 .factorypath
+src/main/resources/application.yml
