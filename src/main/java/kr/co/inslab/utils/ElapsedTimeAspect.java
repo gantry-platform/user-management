@@ -18,15 +18,16 @@ public class ElapsedTimeAspect {
     @Around("execution(* kr.co.inslab..*.*(..))")
     public Object printElapsedTime(final ProceedingJoinPoint joinPoint) throws Throwable{
         long start = System.currentTimeMillis();
-        String typeName = joinPoint.getSignature().getDeclaringTypeName();
-        String name = joinPoint.getSignature().getName();
 
+        logger.debug("[ElapsedTimeCheck] [getSignature().getDeclaringTypeName()] => [" + joinPoint.getSignature().getDeclaringTypeName()
+                + "]");
+        logger.debug(
+                "[ElapsedTimeCheck] [getSignature().getName()] => [" + joinPoint.getSignature().getName() + "() ]");
         Object obj = joinPoint.proceed();
 
         long elapsedTime = System.currentTimeMillis() - start;
-        logger.debug("Elapsed Time: "+elapsedTime+" millis"+", Class:"+typeName+", Method:"+name);
-
-
+        logger.debug("[ElapsedTimeCheck]  [" + joinPoint.getSignature().getName() + "()][Elapsed Time] => "
+                + elapsedTime + " milliseconds.");
         return obj;
     }
 
